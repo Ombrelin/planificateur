@@ -1,0 +1,34 @@
+@model int?
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Planificateur - Create Poll</title>
+</head>
+<body>
+
+<h1>Create Poll</h1>
+
+@if (@Model is not null)
+{
+    <form action="/polls/create" method="post">
+        <input type="text" name="pollName"/>
+        @for (int i = 0; i < @Model; ++i)
+        {
+            <input type="date" name="dates[]"/>
+        }
+        <button>Create</button>
+    </form>
+}
+else
+{
+    <form action="/polls/create" method="get">
+        <label for="datesCount">Number of Dates in Poll : </label>
+        <input type="number" name="datesCount"/>
+        
+        <button type="submit">Validate</button>
+    </form>
+}
+
+</body>
+</html>

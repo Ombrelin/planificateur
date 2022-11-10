@@ -1,0 +1,24 @@
+@startuml
+class ApplicationUser {
+
+}
+
+class Poll {
+   + Name: string
+   + Dates: List<DateOnly>
+}
+
+class Vote {
+    + Date: DateOnly
+    + VoterName: string
+}
+
+enum Availability {
+ Available
+ NotAvailable
+ Maybe
+}
+
+Poll "+ Votes" *--> Vote
+Vote "+Availability" --> Availability
+@enduml
