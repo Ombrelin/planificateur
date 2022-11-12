@@ -6,35 +6,30 @@ namespace Planificateur.Core;
 public class PollApplication
 {
     private readonly IPollsRepository pollsRepository;
+    private readonly IVotesRepository votesRepository;
 
-    public PollApplication(IPollsRepository pollsRepository)
+    public PollApplication(IPollsRepository pollsRepository, IVotesRepository votesRepository)
     {
         this.pollsRepository = pollsRepository;
+        this.votesRepository = votesRepository;
     }
 
-    public Task<Guid> CreatePoll(Poll poll)
+    public async Task<Guid> CreatePoll(Poll poll)
     {
-        throw new NotImplementedException();
+        await this.pollsRepository.Insert(poll);
+        return poll.Id;
     }
 
-    public Task<Poll> GetPoll(Guid id)
+    public async Task<Poll?> GetPoll(Guid id)
     {
-        throw new NotImplementedException();
+        Poll? poll = await this.pollsRepository.Get(id);
+        return poll;
     }
 
-    public Task Vote(Vote vote)
-    {
-        throw new NotImplementedException();
-    }
+    public Task Vote(Vote vote) => this.votesRepository.Save(vote);
 
-    public Task RemoveVote(string voterName)
+    public async Task RemoveVote(string voteId)
     {
-        throw new NotImplementedException();
+        await this.votesRepository.Delete(voteId);
     }
-
-    public Task ChangeVote(Vote vote)
-    {
-        throw new NotImplementedException();
-    }
-    
 }

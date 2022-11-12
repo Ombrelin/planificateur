@@ -4,7 +4,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Core", "src\P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Web", "src\Planificateur.Web\Planificateur.Web.csproj", "{1B6ECCFD-50E4-43CA-9290-FC851F1F9B28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Core.Tests", "tests\Planificateur.Core.Tests\Planificateur.Core.Tests.csproj", "{41C8E50C-625C-40C2-B4AA-CF4E967551DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Core.Tests", "test\Planificateur.Core.Tests\Planificateur.Core.Tests.csproj", "{41C8E50C-625C-40C2-B4AA-CF4E967551DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Web.Tests", "test\Planificateur.Web.Tests\Planificateur.Web.Tests.csproj", "{50605981-15EE-4274-809C-066EA74705B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +26,9 @@ Global
 		{41C8E50C-625C-40C2-B4AA-CF4E967551DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41C8E50C-625C-40C2-B4AA-CF4E967551DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41C8E50C-625C-40C2-B4AA-CF4E967551DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50605981-15EE-4274-809C-066EA74705B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50605981-15EE-4274-809C-066EA74705B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50605981-15EE-4274-809C-066EA74705B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50605981-15EE-4274-809C-066EA74705B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
