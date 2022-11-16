@@ -6,10 +6,10 @@ public class Poll
     private string name;
     public required string Name    {
         get => name;
-        init => name = value is "" ? throw new ArgumentException("Poll name can't be empty") : value;
+        init => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
     }
 
-    public DateTime ExpirationDate { get; init; }
+    public DateTime ExpirationDate { get; set; }
     public IList<Vote> Votes { get; set; }
 
     private IList<DateTime> dates = new List<DateTime>();
