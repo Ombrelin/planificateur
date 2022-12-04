@@ -1,14 +1,120 @@
-@model Planificateur.Core.Entities.Poll
+@using Planificateur.Core.Entities
+@model Planificateur.Core.Entities.Poll?
 
-<!DOCTYPE html>
+@{
+    Layout = "Layout";
+    ViewData["Title"] = $"Poll - {(Model is null ? "Not Found" : Model.Name)}";
+}
 
-<html>
-<head>
-    <title>Poll - @Model.Name</title>
-</head>
-<body>
-<div>
-    <h1>@Model.Name</h1>
+<div class="center">
+    <div class="box">
+        @if (@Model is null)
+        {
+            <h1 class="title">404 - Not Found</h1>
+            <h2 class="subtitle">There is no poll associated with this link</h2>
+        }
+        else
+        {
+            <h1 class="title">@Model.Name</h1>
+
+            <form action="/polls/@Model.Id/votes" method="post">
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        @foreach (var vote in @Model.Votes)
+                        {
+                            <th class="@vote.Id">@vote.VoterName</th>
+                        }
+                        <th>
+                            <div class="field">
+                                <label class="label">Your Name : </label>
+                                <div class="control">
+                                    <input class="input" id="voter-name" name="voterName" type="text"/>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ((DateTime date, int index) in @Model.Dates.Select((elt, index) => (elt,index)))
+                    {
+                        <tr>
+                            <td>@date.ToString("dddd d MMMM yyyy")</td>
+                            @foreach (var vote in @Model.Votes)
+                            {
+                                <td class="@vote.Id">
+                                    @{
+                                        switch (vote.Availability[index])
+                                        {
+                                            case Availability.Available:
+                                                <text>✅</text>
+                                                break;
+                                            case Availability.Possible:
+                                                <text> ❔
+                                                </text>
+                                                break;
+                                            case Availability.NotAvailable:
+                                                <text>❌</text>
+                                                break;
+                                        }
+
+                                    }
+                                    @vote.Availability[index]
+                                </td>
+                            }
+                            <td>
+                                <div class="control">
+                                    <label class="radio">
+                                        <input type="radio" name="availability[@index]" value="Available"/>
+                                        ✅ Available
+                                    </label>
+                                </div>
+                                <div class="control">
+                                    <label class="radio">
+                                        <input type="radio" name="availability[@index]" value="Possible"/>
+                                        ❔ Possible
+                                    </label>
+                                </div>
+                                <div class="control">
+                                    <label class="radio">
+                                        <input type="radio" name="availability[@index]" value="NotAvailable"/>
+                                        ❌ NotAvailable
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td></td>
+                        @foreach (Vote vote in @Model.Votes)
+                        {
+                            <td></td>
+                        }
+                        <td style="display: grid; justify-content: end">
+
+                            <button id="create-vote" class="button is-primary">Add Vote</button>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </form>
+            <div id="best-dates">
+                @{
+                    var bestDates = @Model.BestDates;
+                }
+                Best dates (with score of<span style="font-weight: bolder"> @bestDates.score</span>) :
+                <ul>
+
+                    @foreach (DateTime date in @bestDates.dates)
+                    {
+                        <li>@date.ToString("dddd d MMMM yyyy")</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
 </div>
-</body>
-</html>

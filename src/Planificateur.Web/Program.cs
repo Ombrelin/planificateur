@@ -8,14 +8,16 @@ public class Program
 {
     public static Task Main(string[] args)
     {
+        var database = new InMemoryDatabase();
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllers();
         builder.Services.AddMvc();
-        builder.Services.AddSingleton<IPollsRepository, InMemoryPollsRepository>();
-        builder.Services.AddSingleton<IVotesRepository, InMemoryVotesRepository>();
+        builder.Services.AddSingleton<IPollsRepository>(database);
+        builder.Services.AddSingleton<IVotesRepository>(database);
         builder.Services.AddSingleton<PollApplication>();
         WebApplication app = builder.Build();
 
+        app.UseStaticFiles();
         app.MapControllers();
         app.MapGet("/", () => "Hello World!");
 

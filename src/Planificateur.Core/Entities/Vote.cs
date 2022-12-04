@@ -2,7 +2,7 @@ namespace Planificateur.Core.Entities;
 
 public class Vote
 {
-    public string Id => PollId + VoterName;
+    public string Id => $"vote-{PollId}-{VoterName.Replace(" ", "_")}";
     
     public required Guid PollId { get; init; }
     public required string VoterName { get; init; }

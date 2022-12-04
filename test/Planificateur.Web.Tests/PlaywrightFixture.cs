@@ -18,7 +18,10 @@ public class PlaywrightFixture : IAsyncLifetime
             Headless = false,
             SlowMo = 500,
         });
-        Page = await browser.NewPageAsync();
+        Page = await browser.NewPageAsync(new ()
+        {
+            RecordVideoDir = "videos"
+        });
         Page.SetDefaultTimeout(10000);
     }
 

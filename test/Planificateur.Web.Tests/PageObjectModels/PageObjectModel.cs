@@ -15,5 +15,5 @@ public abstract class PageObjectModel
         this.baseAppUrl = baseAppUrl;
     }
 
-    public Task GotoAsync() => Page.GotoAsync($"{Path}{baseAppUrl}");
+    public virtual Task GotoAsync() => Page.GotoAsync($"{baseAppUrl}{Path}");
 }

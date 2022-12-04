@@ -15,15 +15,26 @@ public class PollsController : Controller
     }
 
     [HttpGet("create")]
-    public IActionResult CreatePollForm([FromQuery] int? datesCount)
+    public IActionResult CreatePollForm()
     {
-        return View("Views/Polls/Create.cshtml", datesCount);
+        return View("Views/Polls/Create.cshtml");
     }
-    
+
     [HttpPost("create")]
     public async Task<IActionResult> CreatePollFormSubmit(Poll poll)
     {
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Errors = ModelState
+                .Values
+                .SelectMany(model => model.Errors)
+                .Select(error => error.Exception?.Message)
+                .Where(error => error is not null);
+            return View("Views/Polls/Create.cshtml");
+        }
+        
         await pollApplication.CreatePoll(poll);
+        
         return Redirect($"/polls/{poll.Id}");
     }
 
@@ -31,10 +42,22 @@ public class PollsController : Controller
     public async Task<IActionResult> ViewPoll(Guid id)
     {
         Poll? poll = await pollApplication.GetPoll(id);
-        if (poll is null)
-        {
-            return NotFound();
-        }
         return View("Views/Polls/Poll.cshtml", poll);
+    }
+
+    [HttpPost("{id:guid}/votes")]
+    public async Task<IActionResult> AddVote(Guid id, IFormCollection data)
+    {
+        var vote = new Vote
+        {
+            PollId = id, 
+            VoterName = data["voterName"],
+            Availability = data
+                .Where(formData => formData.Key.Contains("availability"))
+                .Select(value => Enum.Parse<Availability>(value.Value))
+                .ToList()
+        };
+        await pollApplication.Vote(vote);
+        return Redirect($"/polls/{id}");
     }
 }

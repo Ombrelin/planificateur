@@ -6,16 +6,18 @@ namespace Planificateur.Web.Tests.PageObjectModels.Polls;
 
 public class CreatePageObjectModel : PageObjectModel
 {
-    public override string Path => "/polls/create";
+    public override string Path => "polls/create";
 
     public CreatePageObjectModel(IPage page, string baseAppUrl) : base(page, baseAppUrl)
     {
     }
 
-    public async Task SubmitNumberOfDates(int numberOfDates)
+    public async Task AddDates(int numberOfDates)
     {
-        await Page.FillAsync("input", numberOfDates.ToString());
-        await Page.ClickAsync("button");
+        foreach (var _ in Enumerable.Range(1, numberOfDates))
+        {
+            await Page.ClickAsync("#add-date");  
+        }
     }
 
     public async Task SubmitPollCreation(string name, DateTime[] dates)
@@ -29,6 +31,8 @@ public class CreatePageObjectModel : PageObjectModel
             await input.FillAsync(dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
         }
 
-        await Page.ClickAsync("button");
+        await Page.ClickAsync("#create");
+        
+        
     }
 }

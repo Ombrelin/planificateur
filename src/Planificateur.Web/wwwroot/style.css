@@ -1,0 +1,15 @@
+.center {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    height: 100vh;
+}
+
+#best-dates {
+    width: 100%;
+}
+
+ul {
+    margin: 1rem !important;
+    list-style: circle !important;
+}

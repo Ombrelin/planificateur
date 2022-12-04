@@ -1,34 +1,72 @@
-@model int?
-<!DOCTYPE html>
+@{
+    Layout = "Layout";
+    ViewData["Title"] = "Create Poll";
+}
 
-<html>
-<head>
-    <title>Planificateur - Create Poll</title>
-</head>
-<body>
+<div class="center">
+    <form action="/polls/create" method="post" class="box">
+        <h1 class="title">Create Poll</h1>
 
-<h1>Create Poll</h1>
-
-@if (@Model is not null)
-{
-    <form action="/polls/create" method="post">
-        <input type="text" name="name"/>
-        @for (int i = 0; i < @Model; ++i)
+        @if (ViewBag.Errors is not null)
         {
-            <input type="date" name="dates[]"/>
+            <div class="notification is-danger">
+                <ul>
+
+
+                    @foreach (var message in ViewBag.Errors)
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            </div>
         }
-        <button>Create</button>
+
+        <div class="field">
+            <label class="label">Poll Name : </label>
+            <div class="control">
+                <input class="input" type="text" name="name"/>
+            </div>
+        </div>
+
+        <div id="dates" style="max-height: 60vh; overflow-y: auto; overflow-x: hidden">
+            <div class="field">
+                <label class="label">Poll Dates : </label>
+                <div class="control">
+                    <input class="input" type="date" name="dates[]"/>
+                </div>
+            </div>
+        </div>
+
+        <br/>
+
+        <button type="button" id="add-date" onclick="addDate()" class="button">Add date</button>
+        <button type="submit" id="create" class="button is-primary">Create</button>
+
     </form>
-}
-else
-{
-    <form action="/polls/create" method="get">
-        <label for="datesCount">Number of Dates in Poll : </label>
-        <input type="number" name="datesCount"/>
-        
-        <button type="submit">Validate</button>
-    </form>
+
+</div>
+<script>
+
+const addDate = () => {
+    const dates = document.querySelector("#dates");
+    const dateInput = document.createElement("input");
+    dates.innerHTML += `
+        <div class="columns">
+            <div class="field column is-three-quarters">
+                <div class="control">
+                    <input class="input" type="date" name="dates[]"/>
+                </div>
+            </div>
+            <div class="column">
+                <button onclick="removeDate(this)" class="button is-danger">➖</button>
+            </div>
+            
+        </div>
+    `;
 }
 
-</body>
-</html>
+const removeDate = (element) => {
+    element.parentNode.parentNode.remove(element);
+}
+
+</script>
