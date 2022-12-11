@@ -4,6 +4,6 @@ namespace Planificateur.Core.Repositories;
 
 public interface IVotesRepository
 {
-    Task Delete(string id);
+    Task Delete(Guid id);
     Task Save(Vote vote);
 }

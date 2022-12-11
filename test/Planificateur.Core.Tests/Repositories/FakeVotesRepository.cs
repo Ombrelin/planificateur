@@ -5,7 +5,7 @@ namespace Planificateur.Core.Tests.Repositories;
 
 public class FakeVotesRepository : IVotesRepository
 {
-    public IDictionary<string, Vote> Data = new Dictionary<string, Vote>();
+    public IDictionary<Guid, Vote> Data = new Dictionary<Guid, Vote>();
 
     public Task<Vote> Insert(Vote vote)
     {
@@ -13,7 +13,7 @@ public class FakeVotesRepository : IVotesRepository
         return Task.FromResult(vote);
     }
 
-    public Task Delete(string id)
+    public Task Delete(Guid id)
     {
         Data.Remove(id);
         return Task.CompletedTask;

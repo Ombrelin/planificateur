@@ -12,9 +12,9 @@ public class Poll
     public DateTime ExpirationDate { get; set; }
     public IList<Vote> Votes { get; set; }
 
-    private IList<DateTime> dates = new List<DateTime>();
+    private List<DateTime> dates = new List<DateTime>();
 
-    public required IList<DateTime> Dates
+    public required List<DateTime> Dates
     {
         get => dates;
         set => dates = value.Count is 0 ? throw new ArgumentException("Poll dates can't be empty") : value;
@@ -54,7 +54,7 @@ public class Poll
     {
         var scoredDates = Dates
             .Select((date, index) =>
-                (date, score: Votes.Select(vote => vote.Availability[index]).Select(availability => (decimal)availability).Sum() / 2))
+                (date, score: Votes.Select(vote => vote.Availabilities[index]).Select(availability => (decimal)availability).Sum() / 2))
             .ToList();
         return scoredDates;
     }

@@ -28,7 +28,7 @@ public class PollApplication
 
     public Task Vote(Vote vote) => this.votesRepository.Save(vote);
 
-    public async Task RemoveVote(string voteId)
+    public async Task RemoveVote(Guid voteId)
     {
         await this.votesRepository.Delete(voteId);
     }

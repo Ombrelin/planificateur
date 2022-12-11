@@ -25,7 +25,7 @@
                         <th></th>
                         @foreach (var vote in @Model.Votes)
                         {
-                            <th class="@vote.Id">@vote.VoterName</th>
+                            <th class="vote-@vote.Id">@vote.VoterName</th>
                         }
                         <th>
                             <div class="field">
@@ -46,7 +46,7 @@
                             {
                                 <td class="@vote.Id">
                                     @{
-                                        switch (vote.Availability[index])
+                                        switch (vote.Availabilities[index])
                                         {
                                             case Availability.Available:
                                                 <text>✅</text>
@@ -61,7 +61,7 @@
                                         }
 
                                     }
-                                    @vote.Availability[index]
+                                    @vote.Availabilities[index]
                                 </td>
                             }
                             <td>

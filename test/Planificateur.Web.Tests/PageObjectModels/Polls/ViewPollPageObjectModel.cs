@@ -43,7 +43,7 @@ public class ViewPollPageObjectModel : PageObjectModel
         var dateRows = await Page.QuerySelectorAllAsync("tbody>tr");
         foreach ((IElementHandle dateRow, int index) in dateRows.Select((elt,index) => (elt, index)))
         {
-            var availability = vote.Availability[index];
+            var availability = vote.Availabilities[index];
             var radioButton = await dateRow.QuerySelectorAsync($"""input[type="radio"][name="availability[{index}]"][value="{availability.ToString()}"]""" );
             await radioButton.ClickAsync();
         }
@@ -53,14 +53,14 @@ public class ViewPollPageObjectModel : PageObjectModel
 
     public async Task VerifyVote(Vote vote)
     {
-        var voterNameHeader = await Page.QuerySelectorAsync($"thead>tr>th.{vote.Id}");
+        var voterNameHeader = await Page.QuerySelectorAsync($"thead>tr>th.vote-{vote.Id}");
         var voterNameText = await voterNameHeader.TextContentAsync();
         voterNameText.Should().Be(vote.VoterName);
         
         var dateRows = await Page.QuerySelectorAllAsync("tbody>tr");
         foreach ((IElementHandle dateRow, int index) in dateRows.Select((elt,index) => (elt, index)))
         {
-            var availability = vote.Availability[index];
+            var availability = vote.Availabilities[index];
             var cell = await dateRow.QuerySelectorAsync($"td.{vote.Id}");
             var text = await cell.TextContentAsync();
             text.Should().Contain(availability.ToString());

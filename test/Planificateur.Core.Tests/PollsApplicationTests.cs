@@ -64,7 +64,7 @@ public class PollsApplicationTests
         {
             PollId = poll.Id,
             VoterName = "Test Voter Name",
-            Availability = new List<Availability>
+            Availabilities = new List<Availability>
             {
                 Availability.Available,
                 Availability.Available,
@@ -94,7 +94,7 @@ public class PollsApplicationTests
         {
             PollId = poll.Id,
             VoterName = "Test Voter Name",
-            Availability = new List<Availability>
+            Availabilities = new List<Availability>
             {
                 Availability.Available,
                 Availability.Available,

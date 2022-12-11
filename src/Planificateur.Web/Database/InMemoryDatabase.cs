@@ -21,7 +21,7 @@ public class InMemoryDatabase : IPollsRepository,IVotesRepository
         return Task.FromResult(vote);
     }
 
-    public Task Delete(string id)
+    public Task Delete(Guid id)
     {
         Poll poll = Data.First(kvp => kvp.Value.Votes.Any(vote => vote.Id == id)).Value;
         poll.Votes.Remove(poll.Votes.First(vote => vote.Id == id));

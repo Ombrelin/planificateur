@@ -1,7 +1,5 @@
-using System.Globalization;
 using FluentAssertions;
 using Microsoft.Playwright;
-using Org.BouncyCastle.Asn1.Cms;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Tests.PageObjectModels.Polls;
 
@@ -16,7 +14,7 @@ public class PlanificateurTests : IClassFixture<WebApplicationFactoryFixture>, I
     public PlanificateurTests(WebApplicationFactoryFixture webApplicationFactoryFixture,
         PlaywrightFixture playwrightFixture)
     {
-        this.serverAddress = webApplicationFactoryFixture.ServerAddress;
+        this.serverAddress = webApplicationFactoryFixture.CreateClient().BaseAddress.ToString();
         page = playwrightFixture.Page;
     }
 
@@ -68,7 +66,7 @@ public class PlanificateurTests : IClassFixture<WebApplicationFactoryFixture>, I
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var vote = new Vote
         {
-            VoterName = voter, PollId = pollId, Availability = new List<Availability>
+            VoterName = voter, PollId = pollId, Availabilities = new List<Availability>
             {
                 Availability.Available,
                 Availability.NotAvailable,
@@ -96,7 +94,7 @@ public class PlanificateurTests : IClassFixture<WebApplicationFactoryFixture>, I
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var vote1 = new Vote
         {
-            VoterName = "Shepard", PollId = pollId, Availability = new List<Availability>
+            VoterName = "Shepard", PollId = pollId, Availabilities = new List<Availability>
             {
                 Availability.NotAvailable,
                 Availability.Available,
@@ -105,7 +103,7 @@ public class PlanificateurTests : IClassFixture<WebApplicationFactoryFixture>, I
         };
         var vote2 = new Vote
         {
-            VoterName = "Tali", PollId = pollId, Availability = new List<Availability>
+            VoterName = "Tali", PollId = pollId, Availabilities = new List<Availability>
             {
                 Availability.Available,
                 Availability.Available,

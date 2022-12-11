@@ -52,7 +52,7 @@ public class PollsController : Controller
         {
             PollId = id, 
             VoterName = data["voterName"],
-            Availability = data
+            Availabilities = data
                 .Where(formData => formData.Key.Contains("availability"))
                 .Select(value => Enum.Parse<Availability>(value.Value))
                 .ToList()

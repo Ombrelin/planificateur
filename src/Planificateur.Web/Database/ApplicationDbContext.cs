@@ -3,7 +3,16 @@ using Planificateur.Core.Entities;
 
 namespace Planificateur.Web.Database;
 
-public class ApplicationDbContext : DbContext {
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+    }
+
+    public DbSet<Poll> Polls { get; set; }
+    public DbSet<Vote> Votes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,6 +33,7 @@ public class ApplicationDbContext : DbContext {
             entity
                 .Property(vote => vote.Id)
                 .ValueGeneratedNever();
+            entity.Property(vote => vote.Availabilities);
             entity
                 .HasOne<Poll>()
                 .WithMany(poll => poll.Votes)

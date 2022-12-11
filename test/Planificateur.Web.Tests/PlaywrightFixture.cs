@@ -22,7 +22,7 @@ public class PlaywrightFixture : IAsyncLifetime
         {
             RecordVideoDir = "videos"
         });
-        Page.SetDefaultTimeout(10000);
+        Page.SetDefaultTimeout(100000);
     }
 
     public async Task DisposeAsync()
