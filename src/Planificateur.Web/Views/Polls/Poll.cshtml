@@ -23,25 +23,46 @@
                     <thead>
                     <tr>
                         <th></th>
-                        @foreach (var vote in @Model.Votes)
-                        {
-                            <th class="vote-@vote.Id">@vote.VoterName</th>
-                        }
                         <th>
                             <div class="field">
                                 <label class="label">Your Name : </label>
                                 <div class="control">
-                                    <input class="input" id="voter-name" name="voterName" type="text"/>
+                                    <input required class="input" id="voter-name" name="voterName" type="text"/>
                                 </div>
                             </div>
                         </th>
+                        @foreach (var vote in @Model.Votes)
+                        {
+                            <th class="vote-@vote.Id">@vote.VoterName</th>
+                        }
+
                     </tr>
                     </thead>
                     <tbody>
                     @foreach ((DateTime date, int index) in @Model.Dates.Select((elt, index) => (elt,index)))
                     {
                         <tr>
-                            <td>@date.ToString("dddd d MMMM yyyy")</td>
+                            <td>@date.ToString("dddd dd/MM/yy")</td>
+                            <td>
+                                <div class="control">
+                                    <label class="radio">
+                                        <input type="radio" required name="availability[@index]" value="Available"/>
+                                        ✅ <span class="vote-legend">Available</span>
+                                    </label>
+                                </div>
+                                <div class="control">
+                                    <label class="radio">
+                                        <input type="radio" required name="availability[@index]" value="Possible"/>
+                                        ❔ <span class="vote-legend">Possible</span>
+                                    </label>
+                                </div>
+                                <div class="control">
+                                    <label class="radio">
+                                        <input type="radio" required name="availability[@index]" value="NotAvailable"/>
+                                        ❌ <span class="vote-legend">NotAvailable</span>
+                                    </label>
+                                </div>
+                            </td>
                             @foreach (var vote in @Model.Votes)
                             {
                                 <td class="@vote.Id">
@@ -61,43 +82,25 @@
                                         }
 
                                     }
-                                    @vote.Availabilities[index]
+                                    <span class="vote-legend">@vote.Availabilities[index]</span>
                                 </td>
                             }
-                            <td>
-                                <div class="control">
-                                    <label class="radio">
-                                        <input type="radio" name="availability[@index]" value="Available"/>
-                                        ✅ Available
-                                    </label>
-                                </div>
-                                <div class="control">
-                                    <label class="radio">
-                                        <input type="radio" name="availability[@index]" value="Possible"/>
-                                        ❔ Possible
-                                    </label>
-                                </div>
-                                <div class="control">
-                                    <label class="radio">
-                                        <input type="radio" name="availability[@index]" value="NotAvailable"/>
-                                        ❌ NotAvailable
-                                    </label>
-                                </div>
-                            </td>
+
                         </tr>
                     }
                     </tbody>
                     <tfoot>
                     <tr>
                         <td></td>
+                        <td>
+
+                            <button id="create-vote" class="button is-primary">Add Vote</button>
+                        </td>
                         @foreach (Vote vote in @Model.Votes)
                         {
                             <td></td>
                         }
-                        <td style="display: grid; justify-content: end">
 
-                            <button id="create-vote" class="button is-primary">Add Vote</button>
-                        </td>
                     </tr>
                     </tfoot>
                 </table>
@@ -111,7 +114,7 @@
 
                     @foreach (DateTime date in @bestDates.dates)
                     {
-                        <li>@date.ToString("dddd d MMMM yyyy")</li>
+                        <li>@date.ToString("dd/MM/yy")</li>
                     }
                 </ul>
             </div>

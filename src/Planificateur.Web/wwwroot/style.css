@@ -9,7 +9,38 @@
     width: 100%;
 }
 
+#create-vote {
+    display: grid; justify-content: end;
+}
+
 ul {
     margin: 1rem !important;
     list-style: circle !important;
+}
+
+@media only screen and (max-width: 600px) {
+    
+    .center {
+        display: flex;
+        height: auto;
+    }
+    
+    table {
+        width: 100%;
+        overflow-x: scroll;
+        display: block;
+    }
+
+    .box {
+        margin-top: 1.25rem;
+        max-width: 90%;
+    }
+    
+    .vote-legend {
+        display: none;
+    }
+    
+    #create-vote {
+        display: block;
+    }
 }
