@@ -111,7 +111,11 @@
                 }
                 Best dates (with score of<span style="font-weight: bolder"> @bestDates.score</span>) :
                 <ul>
-
+                    @if (!@bestDates.dates.Any())
+                    {
+                        <span>No votes yet.</span>
+                    }
+                    
                     @foreach (DateTime date in @bestDates.dates)
                     {
                         <li>@date.ToString("dd/MM/yy")</li>
