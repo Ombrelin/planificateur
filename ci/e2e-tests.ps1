@@ -39,7 +39,7 @@ docker rm planificateur-e2e
 docker stop postgres
 docker rm postgres
 
-docker rm planificateur-e2e-tests-exe
+docker rm planificateur-e2e-tests-exec
 
 docker network rm planificateur
 
