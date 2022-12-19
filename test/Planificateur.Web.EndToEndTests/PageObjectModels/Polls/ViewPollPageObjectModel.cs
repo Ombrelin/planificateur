@@ -23,7 +23,7 @@ public class ViewPollPageObjectModel : PageObjectModel
         title.Should().Be(pollName);
 
         var formattedDates = dateTimes
-            .Select(dateTime => dateTime.ToString("dddd d MMMM yyyy"));
+            .Select(dateTime => dateTime.ToString("dddd dd/MM/yy"));
         
         var tableCells = await Page.QuerySelectorAllAsync("tbody>tr>td");
         var tableCellsText = await Task.WhenAll(tableCells
@@ -53,7 +53,7 @@ public class ViewPollPageObjectModel : PageObjectModel
 
     public async Task VerifyVote(Vote vote)
     {
-        var voterNameHeader = await Page.QuerySelectorAsync($"thead>tr>th.vote-{vote.Id}");
+        var voterNameHeader = (await Page.QuerySelectorAllAsync($"thead>tr>th")).Last();
         var voterNameText = await voterNameHeader.TextContentAsync();
         voterNameText.Should().Be(vote.VoterName);
         
@@ -61,7 +61,7 @@ public class ViewPollPageObjectModel : PageObjectModel
         foreach ((IElementHandle dateRow, int index) in dateRows.Select((elt,index) => (elt, index)))
         {
             var availability = vote.Availabilities[index];
-            var cell = await dateRow.QuerySelectorAsync($"td.{vote.Id}");
+            var cell = (await dateRow.QuerySelectorAllAsync("td")).Last();
             var text = await cell.TextContentAsync();
             text.Should().Contain(availability.ToString());
         }
@@ -74,7 +74,7 @@ public class ViewPollPageObjectModel : PageObjectModel
         foreach ((IElementHandle listElement, int index) in bestDates.Select((elt, index) => (elt, index)))
         {
             var text = await listElement.TextContentAsync();
-            text.Should().Be(dateTimes[index].ToString("dddd d MMMM yyyy"));
+            text.Should().Be(dateTimes[index].ToString("dddd dd/MM/yy"));
         }
     }
 }

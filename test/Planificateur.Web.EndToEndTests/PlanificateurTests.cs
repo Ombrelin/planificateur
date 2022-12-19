@@ -3,18 +3,17 @@ using Microsoft.Playwright;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Tests.PageObjectModels.Polls;
 
-namespace Planificateur.Web.Tests;
+namespace Planificateur.Web.EndToEndTests;
 
 [Collection("E2E Tests")]
-public class PlanificateurTests : IClassFixture<WebApplicationFactoryFixture>, IClassFixture<PlaywrightFixture>
+public class PlanificateurTests : IClassFixture<PlaywrightFixture>
 {
     private readonly IPage page;
     private readonly string serverAddress;
 
-    public PlanificateurTests(WebApplicationFactoryFixture webApplicationFactoryFixture,
-        PlaywrightFixture playwrightFixture)
+    public PlanificateurTests(PlaywrightFixture playwrightFixture)
     {
-        this.serverAddress = webApplicationFactoryFixture.CreateClient().BaseAddress.ToString();
+        this.serverAddress = Environment.GetEnvironmentVariable("APP_URL") ?? throw new ArgumentException("The APP_URL env variable must be populated");
         page = playwrightFixture.Page;
     }
 
