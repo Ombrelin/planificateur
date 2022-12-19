@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "strict": true,
+    "moduleResolution": "classic",
+    "esModuleInterop": true,
+    "outFile": "wwwroot/script.js"
+  },
+  "include": ["ClientScripts/script.ts"]
+}
