@@ -28,7 +28,7 @@ docker run --rm `
     -v "${pwd}:/app" `
     -w /app `
     ombrelin/dotnet7-playwright `
-    /bin/bash -c "~/bin/playwright install-deps && ~/bin/playwright install firefox && dotnet test /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj"
+    /bin/bash -c "dotnet build /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj && ~/bin/playwright install-deps && ~/bin/playwright install firefox && dotnet test /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj"
 
 docker stop planificateur-e2e
 docker rm planificateur-e2e
