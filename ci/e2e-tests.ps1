@@ -21,7 +21,7 @@ docker run -d `
 
 $pwd = pwd;
 
-docker run --rm `
+$result = docker run --rm `
     --env APP_URL="http://planificateur-e2e/" `
     --env IS_CI="true" `
     --net planificateur `
@@ -37,3 +37,5 @@ docker stop postgres
 docker rm postgres
 
 docker network rm planificateur
+
+Exit $result
