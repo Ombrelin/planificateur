@@ -39,6 +39,8 @@ docker rm planificateur-e2e
 docker stop postgres
 docker rm postgres
 
+docker rm planificateur-e2e-tests-exe
+
 docker network rm planificateur
 
 Exit $result
