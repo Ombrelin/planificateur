@@ -3,7 +3,7 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM ombrelin/dotnet7-node AS build
 WORKDIR /app
 COPY . .
 RUN dotnet build "src/Planificateur.Web/Planificateur.Web.csproj" -c Release -o /app/build
