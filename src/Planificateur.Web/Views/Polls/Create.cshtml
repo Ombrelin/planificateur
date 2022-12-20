@@ -39,8 +39,31 @@
 
         <br/>
 
+
         <button type="button" id="add-date" onclick="addDate()" class="button">Add date</button>
         <button type="submit" id="create" class="button is-primary">Create</button>
+
+        <br/>
+        <br/>
+
+        <details>
+            <summary>Add Date Range</summary>
+           
+                <div class="field">
+                    <label class="label">Start Date : </label>
+                    <div class="control">
+                        <input class="input" type="date" id="range-start-date"/>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">End Date : </label>
+                    <div class="control">
+                        <input class="input" type="date" id="range-end-date"/>
+                    </div>
+                </div>
+                <button type="button" id="add-date-range" onclick="addDateRange()" class="button">Add date range</button>
+       
+        </details>
 
     </form>
 
