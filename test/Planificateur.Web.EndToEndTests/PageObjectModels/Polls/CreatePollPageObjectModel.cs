@@ -24,15 +24,13 @@ public class CreatePageObjectModel : PageObjectModel
     {
         await Page.FillAsync("""input[type="text"][ name="name"]""", name);
         
-        var inputs = (await Page.QuerySelectorAllAsync("""input[type="date"][name="dates[]"]""")).ToList();
+        var inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
         inputs.Count.Should().Be(dates.Length);
         foreach ((IElementHandle input, int index) in inputs.Select((element, index) => (element, index)))
         {
-            await input.FillAsync(dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+            await input.FillAsync(dates[index].ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture));
         }
-
+        
         await Page.ClickAsync("#create");
-        
-        
     }
 }
