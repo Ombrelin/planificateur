@@ -4,7 +4,8 @@
     "strict": true,
     "moduleResolution": "classic",
     "esModuleInterop": true,
-    "outFile": "wwwroot/script.js"
+    "outFile": "wwwroot/script.js",
+    "sourceMap": true
   },
   "include": ["ClientScripts/script.ts"]
 }

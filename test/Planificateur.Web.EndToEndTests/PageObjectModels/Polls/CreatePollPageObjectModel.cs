@@ -33,4 +33,36 @@ public class CreatePageObjectModel : PageObjectModel
         
         await Page.ClickAsync("#create");
     }
+
+    public async Task CheckDateExistInForm(List<DateTime> dates)
+    {
+        List<IElementHandle> inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
+        while (inputs.Count < 4)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(10));
+            inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
+        }
+        Assert.Equal(dates.Count, inputs.Count);
+
+        foreach ((IElementHandle input, int index) in inputs.Select((item, index) => (item, index)))
+        {
+            string inputValue = await input.InputValueAsync();
+            Assert.Equal(inputValue, dates[index].ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture));
+        }
+    }
+    
+    public async Task AddDateRange(DateTime startDate, DateTime endDate)
+    {
+        var summary = await Page.QuerySelectorAsync("summary");
+        await summary.ClickAsync();
+        
+        var rangeStartDate = await Page.QuerySelectorAsync("#range-start-date");
+        var rangeEndDate = await Page.QuerySelectorAsync("#range-end-date");
+
+        await rangeStartDate.FillAsync(startDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+        await rangeEndDate.FillAsync(endDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+        
+        var addDateRateButton = await Page.QuerySelectorAsync("#add-date-range");
+        addDateRateButton.ClickAsync();
+    }
 }
