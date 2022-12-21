@@ -1,5 +1,6 @@
-docker network create planificateur
+docker compose up -d
 
+<#
 docker run -d `
     -p 5432:5432 `
     --env POSTGRES_PASSWORD=password `
@@ -18,13 +19,15 @@ docker run -d `
     --name planificateur-e2e `
     --net planificateur `
     ombrelin/planificateur:latest
+#>
 
+cd ..
 $pwd = pwd;
 
 docker run `
     --env APP_URL="http://planificateur-e2e/" `
     --env IS_CI="true" `
-    --net planificateur `
+    --net ci_default `
     --name planificateur-e2e-tests-exec `
     -v "${pwd}:/app" `
     -w /app `
@@ -33,14 +36,6 @@ docker run `
 
 $result = docker inspect planificateur-e2e-tests-exec --format='{{.State.ExitCode}}'
 
-docker stop planificateur-e2e
-docker rm planificateur-e2e
-
-docker stop postgres
-docker rm postgres
-
 docker rm planificateur-e2e-tests-exec
-
-docker network rm planificateur
 
 Exit $result

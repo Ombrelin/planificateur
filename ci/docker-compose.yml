@@ -1,0 +1,22 @@
+services: 
+  postgres:
+    container_name: postgres
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=planificateur
+  planificateur-e2e:
+    container_name: panificateur-e2e
+    image: ombrelin/planificateur:latest
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=planificateur-test
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+    ports: 
+      - 5000:80
