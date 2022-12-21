@@ -37,5 +37,7 @@ docker run `
 $result = docker inspect planificateur-e2e-tests-exec --format='{{.State.ExitCode}}'
 
 docker rm planificateur-e2e-tests-exec
+cd ci
+docker compose down
 
 Exit $result
