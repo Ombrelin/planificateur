@@ -1,4 +1,6 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Npgsql;
 using Planificateur.Core;
 using Planificateur.Core.Entities;
@@ -21,11 +23,7 @@ public class Startup
     {
         services
             .AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new MultipleConstructorsConverter<Poll>());
-                options.JsonSerializerOptions.AddContext<SourceGenerationSerialiser>();
-            });
+            .AddJsonOptions(options => options.JsonSerializerOptions.AddContext<SourceGenerationSerialiser>());
         services.AddMvc();
         services.AddScoped<IPollsRepository, PollsRepository>();
         services.AddScoped<IVotesRepository, VotesRepository>();
@@ -39,6 +37,33 @@ public class Startup
                 Password = Configuration["DB_PASSWORD"],
                 Database = Configuration["DB_NAME"]
             }.ToString());
+        ConfigureSwaggerGen(services);
+    }
+
+    private static void ConfigureSwaggerGen(IServiceCollection services)
+    {
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "Planificateur API",
+                Description = "WebApp to manage date Polls",
+                License = new OpenApiLicense
+                {
+                    Name = "MIT",
+                    Url = new Uri("https://github.com/Ombrelin/planificateur/blob/master/LICENSE.md")
+                },
+                Contact = new OpenApiContact
+                {
+                    Name = "Arsène Lapostolet",
+                    Url = new Uri("https://github.com/Ombrelin")
+                }
+            });
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Planificateur.Web.xml"));
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Planificateur.Core.xml"));
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext context)
@@ -48,6 +73,13 @@ public class Startup
         {
             app.UseDeveloperExceptionPage();
         }
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            options.RoutePrefix = "api";
+        });
+        
         app.UseStaticFiles();
         app.UseRouting();
         app.UseEndpoints(endpoints => endpoints.MapControllers());

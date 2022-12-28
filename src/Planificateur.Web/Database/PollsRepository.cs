@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
 using Planificateur.Core.Repositories;
-using Xunit;
 
 namespace Planificateur.Web.Database;
 
-[Collection("Database Tests")]
 public class PollsRepository : IPollsRepository
 {
     private readonly ApplicationDbContext dbContext;

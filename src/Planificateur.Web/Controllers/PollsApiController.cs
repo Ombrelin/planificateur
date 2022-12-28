@@ -7,6 +7,7 @@ using Planificateur.Core.Entities;
 namespace Planificateur.Web.Controllers;
 
 [Route("api/polls")]
+[Tags("Polls")]
 public class PollsApiController : ControllerBase
 {
     private readonly PollApplication pollApplication;
@@ -16,6 +17,11 @@ public class PollsApiController : ControllerBase
         this.pollApplication = pollApplication;
     }
 
+    /// <summary>
+    /// Create a new Poll.
+    /// </summary>
+    /// <param name="createPollRequest"></param>
+    /// <returns>The created Poll.</returns>
     [HttpPost]
     public async Task<ActionResult<Poll>> CreatePoll([FromBody] CreatePollRequest createPollRequest)
     {
@@ -23,6 +29,11 @@ public class PollsApiController : ControllerBase
         return Created($"/api/polls/{poll.Id}", poll);
     }
 
+    /// <summary>
+    /// Get a Poll from its Id.
+    /// </summary>
+    /// <param name="id">The Poll Id.</param>
+    /// <returns>The corresponding Poll.</returns>
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<Poll>> GetPoll(Guid id)
     {

@@ -18,7 +18,7 @@ public class ViewPollPageObjectModel : PageObjectModel
     public async Task VerifyTitleAndDates(string pollName, DateTime[] dateTimes)
     {
         IElementHandle? titleTag = await Page.QuerySelectorAsync("h1");
-        string title = await titleTag.InnerTextAsync();
+        string title = await titleTag!.InnerTextAsync();
 
         title.Should().Be(pollName);
 
@@ -38,17 +38,17 @@ public class ViewPollPageObjectModel : PageObjectModel
     public async Task AddVote(Vote vote)
     {
         var nameInput = await Page.QuerySelectorAsync("#voter-name");
-        await nameInput.FillAsync(vote.VoterName);
+        await nameInput!.FillAsync(vote.VoterName);
 
         var dateRows = await Page.QuerySelectorAllAsync("tbody>tr");
         foreach ((IElementHandle dateRow, int index) in dateRows.Select((elt,index) => (elt, index)))
         {
             var availability = vote.Availabilities[index];
             var radioButton = await dateRow.QuerySelectorAsync($"""input[type="radio"][name="availability[{index}]"][value="{availability.ToString()}"]""" );
-            await radioButton.ClickAsync();
+            await radioButton!.ClickAsync();
         }
         var submit = await Page.QuerySelectorAsync("#create-vote");
-        await submit.ClickAsync();
+        await submit!.ClickAsync();
     }
 
     public async Task VerifyVote(Vote vote)

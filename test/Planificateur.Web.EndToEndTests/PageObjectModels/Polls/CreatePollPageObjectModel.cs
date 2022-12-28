@@ -54,15 +54,15 @@ public class CreatePageObjectModel : PageObjectModel
     public async Task AddDateRange(DateTime startDate, DateTime endDate)
     {
         var summary = await Page.QuerySelectorAsync("summary");
-        await summary.ClickAsync();
+        await summary!.ClickAsync();
         
         var rangeStartDate = await Page.QuerySelectorAsync("#range-start-date");
         var rangeEndDate = await Page.QuerySelectorAsync("#range-end-date");
 
-        await rangeStartDate.FillAsync(startDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
-        await rangeEndDate.FillAsync(endDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+        await rangeStartDate!.FillAsync(startDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+        await rangeEndDate!.FillAsync(endDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
         
         var addDateRateButton = await Page.QuerySelectorAsync("#add-date-range");
-        addDateRateButton.ClickAsync();
+        await addDateRateButton!.ClickAsync();
     }
 }

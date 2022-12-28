@@ -9,7 +9,9 @@ services:
       - POSTGRES_DB=planificateur
   planificateur-e2e:
     container_name: panificateur-e2e
-    image: ombrelin/planificateur:latest
+    build:
+      dockerfile: src/Planificateur.Web/Dockerfile
+      context: ..
     depends_on:
       - postgres
     environment:

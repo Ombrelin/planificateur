@@ -6,6 +6,7 @@ using Planificateur.Core.Entities;
 namespace Planificateur.Web.Controllers;
 
 [Route("polls")]
+[ApiExplorerSettings(IgnoreApi=true)]
 public class PollsController : Controller
 {
     private readonly PollApplication pollApplication;
