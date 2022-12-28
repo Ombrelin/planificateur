@@ -82,8 +82,11 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
         await CreatePoll(name, dateTimes);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var vote = new Vote
+        (
+            pollId, voter
+        )
         {
-            VoterName = voter, PollId = pollId, Availabilities = new List<Availability>
+            Availabilities = new List<Availability>
             {
                 Availability.Available,
                 Availability.NotAvailable,
@@ -110,8 +113,12 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
         await CreatePoll(name, dateTimes);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var vote1 = new Vote
+        (
+            pollId,
+            "Shepard"
+        )
         {
-            VoterName = "Shepard", PollId = pollId, Availabilities = new List<Availability>
+            Availabilities = new List<Availability>
             {
                 Availability.NotAvailable,
                 Availability.Available,
@@ -119,8 +126,12 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
             }
         };
         var vote2 = new Vote
+        (
+            pollId, 
+            "Tali"
+        )
         {
-            VoterName = "Tali", PollId = pollId, Availabilities = new List<Availability>
+            Availabilities = new List<Availability>
             {
                 Availability.Available,
                 Availability.Available,

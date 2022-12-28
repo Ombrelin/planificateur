@@ -1,3 +1,4 @@
+using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
 using Planificateur.Core.Repositories;
 
@@ -14,10 +15,17 @@ public class PollApplication
         this.votesRepository = votesRepository;
     }
 
-    public async Task<Guid> CreatePoll(Poll poll)
+    public async Task<Poll> CreatePoll(CreatePollRequest createPollRequest)
     {
+        var poll = new Poll(
+            createPollRequest.Name,
+            createPollRequest.Dates
+        )
+        {
+            ExpirationDate = createPollRequest.ExpirationDate
+        };
         await this.pollsRepository.Insert(poll);
-        return poll.Id;
+        return poll;
     }
 
     public async Task<Poll?> GetPoll(Guid id)

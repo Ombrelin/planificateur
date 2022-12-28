@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Planificateur.Core;
+using Planificateur.Core.Entities;
 using Planificateur.Core.Repositories;
 using Planificateur.Web.Database;
+using Planificateur.Web.Json;
 
 namespace Planificateur.Web;
 
@@ -17,7 +19,13 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers();
+        services
+            .AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new MultipleConstructorsConverter<Poll>());
+                options.JsonSerializerOptions.AddContext<SourceGenerationSerialiser>();
+            });
         services.AddMvc();
         services.AddScoped<IPollsRepository, PollsRepository>();
         services.AddScoped<IVotesRepository, VotesRepository>();

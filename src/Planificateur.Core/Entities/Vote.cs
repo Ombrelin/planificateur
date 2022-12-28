@@ -2,15 +2,29 @@ namespace Planificateur.Core.Entities;
 
 public class Vote
 {
-    public Guid Id { get; init; }
-    
-    public required Guid PollId { get; init; }
-    public required string VoterName { get; init; }
-    public List<Availability> Availabilities {get; set; }
+    public Guid Id { get; }
 
-    public Vote()
+    public Guid PollId { get; }
+    private readonly string voterName;
+
+    public string VoterName
     {
-        Id = Guid.NewGuid();
+        get => voterName;
+        private init => voterName =
+            string.IsNullOrEmpty(value) ? throw new ArgumentException("Invalid voter name") : value;
+    }
+
+    public List<Availability> Availabilities { get; set; }
+
+    public Vote(Guid id, Guid pollId, string voterName)
+    {
+        Id = id;
+        PollId = pollId;
+        VoterName = voterName;
         Availabilities = new List<Availability>();
+    }
+
+    public Vote(Guid pollId, string voterName) : this(Guid.NewGuid(), pollId, voterName)
+    {
     }
 }

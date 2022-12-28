@@ -5,7 +5,8 @@ using Planificateur.Web.Database;
 
 namespace Planificateur.Web.Tests.Database;
 
-public class PollsRepositoryTests : IClassFixture<DatabaseFixture>
+[Collection("Database Tests")]
+public class PollsRepositoryTests
 {
     private readonly PollsRepository repository;
     private readonly ApplicationDbContext dbContext;
@@ -21,10 +22,12 @@ public class PollsRepositoryTests : IClassFixture<DatabaseFixture>
     {
         // Given
         var poll = new Poll
+        (
+            "Test Poll",
+            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+        )
         {
-            Name = "Test Poll", 
-            Dates = new List<DateTime> { DateTime.Now, DateTime.Now.AddDays(2) },
-            ExpirationDate = DateTime.Now.AddDays(10)
+            ExpirationDate = DateTime.UtcNow.AddDays(10)
         };
 
         // When
@@ -42,12 +45,14 @@ public class PollsRepositoryTests : IClassFixture<DatabaseFixture>
     {
         // Given
         var poll = new Poll
+        (
+            "Test Poll",
+            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+        )
         {
-            Name = "Test Poll", 
-            Dates = new List<DateTime> { DateTime.Now, DateTime.Now.AddDays(2) },
-            ExpirationDate = DateTime.Now.AddDays(10)
+            ExpirationDate = DateTime.UtcNow.AddDays(10)
         };
-        var vote = new Vote { PollId = poll.Id, VoterName = "Test Voter Name"};
+        var vote = new Vote(poll.Id, "Test Voter Name");
         poll.Votes = new List<Vote> { vote };
 
         // When
@@ -71,12 +76,14 @@ public class PollsRepositoryTests : IClassFixture<DatabaseFixture>
     {
         // Given
         var poll = new Poll
+        (
+            "Test Poll",
+            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+        )
         {
-            Name = "Test Poll", 
-            Dates = new List<DateTime> { DateTime.Now, DateTime.Now.AddDays(2) },
-            ExpirationDate = DateTime.Now.AddDays(10)
+            ExpirationDate = DateTime.UtcNow.AddDays(10)
         };
-        var vote = new Vote { PollId = poll.Id, VoterName = "Test Voter Name"};
+        var vote = new Vote(poll.Id, "Test Voter Name");
         poll.Votes = new List<Vote> { vote };
 
         await dbContext.AddAsync(poll);
@@ -100,10 +107,12 @@ public class PollsRepositoryTests : IClassFixture<DatabaseFixture>
     {
         // Given
         var poll = new Poll
+        (
+            "Test Poll",
+            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+        )
         {
-            Name = "Test Poll", 
-            Dates = new List<DateTime> { DateTime.Now, DateTime.Now.AddDays(2) },
-            ExpirationDate = DateTime.Now.AddDays(10)
+            ExpirationDate = DateTime.UtcNow.AddDays(10)
         };
         await dbContext.AddAsync(poll);
         await dbContext.SaveChangesAsync();

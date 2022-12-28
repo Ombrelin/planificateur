@@ -2,11 +2,11 @@ namespace Planificateur.Core.Entities;
 
 public class Poll
 {
-    public Guid Id { get; init; }
+    public Guid Id { get; }
     private string name;
-    public required string Name    {
+    public string Name    {
         get => name;
-        init => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
+        set => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
     }
 
     public DateTime ExpirationDate { get; set; }
@@ -14,10 +14,24 @@ public class Poll
 
     private List<DateTime> dates = new List<DateTime>();
 
-    public required List<DateTime> Dates
+    public List<DateTime> Dates
     {
         get => dates;
         set => dates = value.Count is 0 ? throw new ArgumentException("Poll dates can't be empty") : value;
+    }
+
+    public Poll(Guid id, string name, List<DateTime> dates)
+    {
+        Name = name;
+        Id = id;
+        ExpirationDate = DateTime.UtcNow.AddMonths(2);
+        Votes = new List<Vote>();
+        Dates = dates;
+    }
+
+    public Poll(string name, List<DateTime> dates) : this(Guid.NewGuid(), name, dates)
+    {
+        
     }
 
     public (IReadOnlyCollection<DateTime> dates, decimal? score) BestDates
@@ -57,12 +71,5 @@ public class Poll
                 (date, score: Votes.Select(vote => vote.Availabilities[index]).Select(availability => (decimal)availability).Sum() / 2))
             .ToList();
         return scoredDates;
-    }
-
-    public Poll()
-    {
-        Id = Guid.NewGuid();
-        Votes = new List<Vote>();
-        ExpirationDate = DateTime.Now.AddMonths(2);
     }
 }

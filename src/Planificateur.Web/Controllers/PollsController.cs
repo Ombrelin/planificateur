@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Planificateur.Core;
+using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
 
 namespace Planificateur.Web.Controllers;
@@ -21,7 +22,7 @@ public class PollsController : Controller
     }
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreatePollFormSubmit(Poll poll)
+    public async Task<IActionResult> CreatePollFormSubmit(CreatePollRequest createPollRequest)
     {
         if (!ModelState.IsValid)
         {
@@ -32,8 +33,8 @@ public class PollsController : Controller
                 .Where(error => error is not null);
             return View("Views/Polls/Create.cshtml");
         }
-        
-        await pollApplication.CreatePoll(poll);
+
+        Poll poll = await pollApplication.CreatePoll(createPollRequest);
         
         return Redirect($"/polls/{poll.Id}");
     }
@@ -49,9 +50,11 @@ public class PollsController : Controller
     public async Task<IActionResult> AddVote(Guid id, IFormCollection data)
     {
         var vote = new Vote
+        (
+            id, 
+            data["voterName"]
+        )
         {
-            PollId = id, 
-            VoterName = data["voterName"],
             Availabilities = data
                 .Where(formData => formData.Key.Contains("availability"))
                 .Select(value => Enum.Parse<Availability>(value.Value))

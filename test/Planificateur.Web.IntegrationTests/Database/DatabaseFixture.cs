@@ -13,7 +13,7 @@ public class DatabaseFixture : IAsyncLifetime {
         DbContext = BuildNewDbContext();
     }
     
-    private static ApplicationDbContext BuildNewDbContext()
+    public static ApplicationDbContext BuildNewDbContext()
     {
         var builder = new NpgsqlConnectionStringBuilder
         {
@@ -23,7 +23,7 @@ public class DatabaseFixture : IAsyncLifetime {
             Password = Environment.GetEnvironmentVariable("DB_PASSWORD"),
             Database = Environment.GetEnvironmentVariable("DB_NAME")
         };
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseNpgsql(builder.ToString())
             .Options;
 
