@@ -1,7 +1,9 @@
-docker compose up -d
+docker compose up -d --build
 
 cd ..
 $pwd = pwd;
+
+Start-Sleep -Seconds 5;
 
 docker run `
     --env APP_URL="http://planificateur-e2e/" `

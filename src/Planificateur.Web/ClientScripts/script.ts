@@ -35,6 +35,11 @@ const addDateRange = () => {
     }
 }
 
+const fillTimezoneInForm = () => {
+    const timezoneInput = document.querySelector("#timezone") as HTMLInputElement;
+    timezoneInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
 const removeDate = (element: HTMLElement) => {
     element.parentElement?.parentElement?.remove();
 }

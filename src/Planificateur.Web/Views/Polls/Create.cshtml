@@ -21,6 +21,8 @@
             </div>
         }
 
+        <input type="hidden" name="timezone" id="timezone">
+
         <div class="field">
             <label class="label">Poll Name : </label>
             <div class="control">
@@ -48,23 +50,27 @@
 
         <details>
             <summary>Add Date Range</summary>
-           
-                <div class="field">
-                    <label class="label">Start Date : </label>
-                    <div class="control">
-                        <input class="input" type="date" id="range-start-date"/>
-                    </div>
+
+            <div class="field">
+                <label class="label">Start Date : </label>
+                <div class="control">
+                    <input class="input" type="date" id="range-start-date"/>
                 </div>
-                <div class="field">
-                    <label class="label">End Date : </label>
-                    <div class="control">
-                        <input class="input" type="date" id="range-end-date"/>
-                    </div>
+            </div>
+            <div class="field">
+                <label class="label">End Date : </label>
+                <div class="control">
+                    <input class="input" type="date" id="range-end-date"/>
                 </div>
-                <button type="button" id="add-date-range" onclick="addDateRange()" class="button">Add date range</button>
-       
+            </div>
+            <button type="button" id="add-date-range" onclick="addDateRange()" class="button">Add date range</button>
+
         </details>
 
     </form>
 
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", fillTimezoneInForm);
+</script>

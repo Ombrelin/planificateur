@@ -12,6 +12,7 @@ services:
     build:
       dockerfile: src/Planificateur.Web/Dockerfile
       context: ..
+      
     depends_on:
       - postgres
     environment:

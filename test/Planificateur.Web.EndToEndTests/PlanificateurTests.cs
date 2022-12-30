@@ -59,7 +59,8 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
     {
         // Given
         const string name = "Test Poll";
-        var dateTimes = new[] { DateTime.Today, DateTime.Today.AddDays(2), DateTime.Today.AddDays(3) };
+        var dateTime = new DateTime(2022,12,15, 12,12,12);
+        var dateTimes = new[] { dateTime, dateTime.AddDays(2), dateTime.AddDays(3) };
         await CreatePoll(name, dateTimes);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
@@ -108,7 +109,8 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
     {
         // Given
         const string name = "Test Poll";
-        var dateTimes = new[] { DateTime.Today, DateTime.Today.AddDays(2), DateTime.Today.AddDays(3) };
+        var dateTime = new DateTime(2022,12,15, 12,12,12);
+        var dateTimes = new[] { dateTime, dateTime.AddDays(2), dateTime.AddDays(3) };
 
         await CreatePoll(name, dateTimes);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
@@ -146,7 +148,7 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
         await viewPollPageModel.AddVote(vote2);
 
         // Then
-        await viewPollPageModel.VerifyBestDates(new[] { DateTime.Today.AddDays(2) });
+        await viewPollPageModel.VerifyBestDates(new[] { dateTime.AddDays(2) });
     }
 
     private async Task CreatePoll(string name, DateTime[] dateTimes)

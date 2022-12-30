@@ -1,4 +1,6 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Planificateur.Core;
 using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
@@ -23,8 +25,9 @@ public class PollsController : Controller
     }
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreatePollFormSubmit(CreatePollRequest createPollRequest)
+    public async Task<IActionResult> CreatePollFormSubmit(CreatePollRequest createPollRequest, IFormCollection data)
     {
+
         if (!ModelState.IsValid)
         {
             ViewBag.Errors = ModelState
@@ -34,8 +37,19 @@ public class PollsController : Controller
                 .Where(error => error is not null);
             return View("Views/Polls/Create.cshtml");
         }
+        
+        StringValues timezone = data.First(kvp => kvp.Key is "timezone").Value;
+        TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timezone);
+      
 
-        Poll poll = await pollApplication.CreatePoll(createPollRequest);
+
+        Poll poll = await pollApplication.CreatePoll(createPollRequest with
+        {
+            Dates = createPollRequest
+                .Dates
+                .Select(date => TimeZoneInfo.ConvertTimeToUtc(date, timeZoneInfo))
+                .ToList()
+        });
         
         return Redirect($"/polls/{poll.Id}");
     }
