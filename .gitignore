@@ -6,4 +6,5 @@ riderModule.iml
 .idea
 **.sln.DotSettings.user
 .fleet
-**.js
+**.js**
+client-sdk-*

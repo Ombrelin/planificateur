@@ -22,7 +22,7 @@ public class PollsApiController : ControllerBase
     /// </summary>
     /// <param name="createPollRequest"></param>
     /// <returns>The created Poll.</returns>
-    [HttpPost]
+    [HttpPost(Name = "Create Poll")]
     public async Task<ActionResult<Poll>> CreatePoll([FromBody] CreatePollRequest createPollRequest)
     {
         Poll poll = await pollApplication.CreatePoll(createPollRequest);
@@ -34,7 +34,7 @@ public class PollsApiController : ControllerBase
     /// </summary>
     /// <param name="id">The Poll Id.</param>
     /// <returns>The corresponding Poll.</returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name="Get Poll")]
     public async Task<ActionResult<Poll>> GetPoll(Guid id)
     {
         return Ok(await pollApplication.GetPoll(id));
