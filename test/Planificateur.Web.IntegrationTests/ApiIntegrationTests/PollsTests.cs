@@ -13,6 +13,7 @@ using Planificateur.Web.Tests.Database;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
+[Collection("Database Tests")]
 public class PollsTests : ApiIntegrationTests
 {
     public PollsTests(WebApplicationFactory<Startup> webApplicationFactory, DatabaseFixture databaseFixture) : base(
