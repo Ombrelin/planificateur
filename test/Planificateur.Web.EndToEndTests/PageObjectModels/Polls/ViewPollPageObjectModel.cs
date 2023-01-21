@@ -23,7 +23,8 @@ public class ViewPollPageObjectModel : PageObjectModel
         title.Should().Be(pollName);
 
         var formattedDates = dateTimes
-            .Select(dateTime => dateTime.ToString("dddd dd/MM/yy"));
+            .Select(dateTime => dateTime.ToString("dddd dd/MM/yy"))
+            .ToList();
         
         var tableCells = await Page.QuerySelectorAllAsync("tbody>tr>td");
         var tableCellsText = await Task.WhenAll(tableCells
@@ -33,6 +34,11 @@ public class ViewPollPageObjectModel : PageObjectModel
             .Where(cellText => formattedDates.Contains(cellText))
             .Should()
             .HaveCount(dateTimes.Length);
+
+        foreach (var (dateCellText, index) in tableCellsText.Select((elt, index) => (elt,index)))
+        {
+            dateCellText.Should().Be(formattedDates[index]);
+        }
     }
 
     public async Task AddVote(Vote vote)

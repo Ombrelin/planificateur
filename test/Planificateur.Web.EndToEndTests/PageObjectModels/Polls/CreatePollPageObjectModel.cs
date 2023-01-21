@@ -20,9 +20,9 @@ public class CreatePageObjectModel : PageObjectModel
         }
     }
 
-    public async Task SubmitPollCreation(string name, DateTime[] dates)
+    public async Task SubmitPoll(string name, DateTime[] dates)
     {
-        await Page.FillAsync("""input[type="text"][ name="name"]""", name);
+        await FillPollName(name);
         
         var inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
         inputs.Count.Should().Be(dates.Length);
@@ -31,9 +31,19 @@ public class CreatePageObjectModel : PageObjectModel
             await input.FillAsync(dates[index].ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture));
         }
         
-        await Page.ClickAsync("#create");
+        await SubmitPoll();
     }
 
+    public async Task FillPollName(string name)
+    {
+        await Page.FillAsync("""input[type="text"][ name="name"]""", name);
+    }
+
+    public async Task SubmitPoll()
+    {
+        await Page.ClickAsync("#create");
+    }
+    
     public async Task CheckDateExistInForm(List<DateTime> dates)
     {
         List<IElementHandle> inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();

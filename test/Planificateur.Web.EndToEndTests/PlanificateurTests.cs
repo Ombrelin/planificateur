@@ -29,7 +29,7 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
 
         // When
         await createPageObjectModel.AddDates(2);
-        await createPageObjectModel.SubmitPollCreation(name, dateTimes);
+        await createPageObjectModel.SubmitPoll(name, dateTimes);
 
         // Then
         page.Url.Should().StartWith($"{serverAddress}polls/");
@@ -52,6 +52,27 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
 
         // Then
         await createPageObjectModel.CheckDateExistInForm(dateTimes);
+    }
+
+    [Fact]
+    public async Task CreatePoll_AddDatesRange_CreatesPollWithCorrectDates()
+    {
+        // Given
+        const string name = "Test Poll";
+        var dateTimes = new []
+            { DateTime.Today, DateTime.Today.AddDays(1), DateTime.Today.AddDays(2), DateTime.Today.AddDays(3) };
+        var createPageObjectModel = new CreatePageObjectModel(page, serverAddress);
+        await createPageObjectModel.GotoAsync();
+        await createPageObjectModel.AddDateRange(DateTime.Today, DateTime.Today.AddDays(3));
+        await createPageObjectModel.FillPollName(name);
+
+        // When
+        await createPageObjectModel.SubmitPoll();
+
+        // Then
+        Guid pollId = Guid.Parse(page.Url.Split("/").Last());
+        var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
+        await viewPollPageModel.VerifyTitleAndDates(name, dateTimes);
     }
 
     [Fact]
@@ -156,6 +177,6 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
         var createPageObjectModel = new CreatePageObjectModel(page, serverAddress);
         await createPageObjectModel.GotoAsync();
         await createPageObjectModel.AddDates(2);
-        await createPageObjectModel.SubmitPollCreation(name, dateTimes);
+        await createPageObjectModel.SubmitPoll(name, dateTimes);
     }
 }
