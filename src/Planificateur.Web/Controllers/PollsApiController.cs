@@ -39,4 +39,11 @@ public class PollsApiController : ControllerBase
     {
         return Ok(await pollApplication.GetPoll(id));
     }
+    
+    [HttpDelete("{id:guid}/votes/{voteId:guid}")]
+    public async Task<ActionResult<Poll>> GetPoll(Guid pollId, Guid voteId)
+    {
+        await pollApplication.RemoveVote(voteId);
+        return Ok();
+    }
 }

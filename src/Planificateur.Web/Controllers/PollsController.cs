@@ -40,8 +40,6 @@ public class PollsController : Controller
         
         StringValues timezone = data.First(kvp => kvp.Key is "timezone").Value;
         TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timezone);
-      
-
 
         Poll poll = await pollApplication.CreatePoll(createPollRequest with
         {

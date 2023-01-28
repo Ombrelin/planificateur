@@ -1,8 +1,9 @@
 using System.Globalization;
 using FluentAssertions;
 using Microsoft.Playwright;
+using Planificateur.Web.Tests.PageObjectModels;
 
-namespace Planificateur.Web.Tests.PageObjectModels.Polls;
+namespace Planificateur.Web.EndToEndTests.PageObjectModels.Polls;
 
 public class CreatePageObjectModel : PageObjectModel
 {
@@ -14,7 +15,7 @@ public class CreatePageObjectModel : PageObjectModel
 
     public async Task AddDates(int numberOfDates)
     {
-        foreach (var _ in Enumerable.Range(1, numberOfDates))
+        foreach (int _ in Enumerable.Range(1, numberOfDates))
         {
             await Page.ClickAsync("#add-date");  
         }
@@ -57,7 +58,8 @@ public class CreatePageObjectModel : PageObjectModel
         foreach ((IElementHandle input, int index) in inputs.Select((item, index) => (item, index)))
         {
             string inputValue = await input.InputValueAsync();
-            Assert.Equal(inputValue, dates[index].ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture));
+            
+            Assert.Contains(dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), inputValue);
         }
     }
     

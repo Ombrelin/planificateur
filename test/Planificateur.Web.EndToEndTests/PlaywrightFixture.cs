@@ -20,7 +20,7 @@ public class PlaywrightFixture : IAsyncLifetime
         } : new BrowserTypeLaunchOptions
         {
             Headless = false,
-            SlowMo = 500
+            //SlowMo = 500
         };
         browser = await playwright.Firefox.LaunchAsync(browserTypeLaunchOptions);
         Page = await browser.NewPageAsync();

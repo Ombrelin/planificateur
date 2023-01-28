@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.Playwright;
 using Planificateur.Core.Entities;
-using Planificateur.Web.Tests.PageObjectModels.Polls;
+using Planificateur.Web.EndToEndTests.PageObjectModels.Polls;
 
 namespace Planificateur.Web.EndToEndTests;
 
@@ -93,6 +93,39 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
         await viewPollPageModel.VerifyTitleAndDates(name, dateTimes);
     }
 
+    [Fact]
+    public async Task DeleteVote_RemovesVote()
+    {
+        // Given
+        const string name = "Test Poll";
+        const string voter = "Test Voter";
+        var dateTimes = new[] { DateTime.Today, DateTime.Today.AddDays(2), DateTime.Today.AddDays(3) };
+
+        await CreatePoll(name, dateTimes);
+        Guid pollId = Guid.Parse(page.Url.Split("/").Last());
+        var vote = new Vote
+        (
+            pollId, voter
+        )
+        {
+            Availabilities = new List<Availability>
+            {
+                Availability.Available,
+                Availability.NotAvailable,
+                Availability.Possible
+            }
+        };
+        var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
+        await viewPollPageModel.GotoAsync();
+        await viewPollPageModel.AddVote(vote);
+        
+        // When
+        await viewPollPageModel.DeleteLastVote();
+        
+        // Then
+        await viewPollPageModel.VerifyNoVotes();
+    }
+    
     [Fact]
     public async Task AddVote_CreatesVote()
     {

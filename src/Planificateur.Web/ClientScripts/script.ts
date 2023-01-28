@@ -23,6 +23,9 @@ const addDateRange = () => {
     const startDate = new Date((document.querySelector("#range-start-date") as HTMLInputElement).value);
     const endDate = new Date((document.querySelector("#range-end-date") as HTMLInputElement).value);
 
+    startDate.setHours(12);
+    endDate.setHours(12);
+    
     const firstDateInput = document.querySelector("#first-date") as HTMLInputElement;
 
     if (firstDateInput.value === "") {
@@ -42,4 +45,12 @@ const fillTimezoneInForm = () => {
 
 const removeDate = (element: HTMLElement) => {
     element.parentElement?.parentElement?.remove();
+}
+
+const deleteVote = async (pollId: string, voteId: string) => {
+    await fetch(`/api/polls/${pollId}/votes/${voteId}`, {
+        method: "DELETE"
+    });
+    
+    location.reload();
 }

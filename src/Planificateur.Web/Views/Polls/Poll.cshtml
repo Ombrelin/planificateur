@@ -41,8 +41,8 @@
                     <tbody>
                     @foreach ((DateTime date, int index) in @Model.Dates.Select((elt, index) => (elt,index)))
                     {
-                        <tr>
-                            <td>@date.ToString("dddd dd/MM/yy")</td>
+                        <tr class="date-row">
+                            <td class="date-cell">@date.ToString("dddd dd/MM/yy")</td>
                             <td>
                                 <div class="control">
                                     <label class="radio">
@@ -82,26 +82,37 @@
                                         }
 
                                     }
-                                    <span class="vote-legend">@vote.Availabilities[index]</span>
                                 </td>
                             }
 
                         </tr>
                     }
-                    </tbody>
-                    <tfoot>
+
                     <tr>
                         <td></td>
                         <td>
 
                             <button id="create-vote" class="button is-primary">Add Vote</button>
                         </td>
-                        @foreach (Vote vote in @Model.Votes)
+                        @if (@Model.Votes.Any())
                         {
-                            <td></td>
+                            @foreach (Vote vote in @Model.Votes)
+                            {
+                                <td class="delete-vote">
+                                    <button type="button" class="button is-danger" onclick="deleteVote('@Model.Id' ,'@vote.Id')">
+                                        <span class="icon">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                    </button>
+                                </td>
+                            }
                         }
 
                     </tr>
+
+                    </tbody>
+                    <tfoot>
+
                     </tfoot>
                 </table>
             </form>
@@ -115,7 +126,7 @@
                     {
                         <span>No votes yet.</span>
                     }
-                    
+
                     @foreach (DateTime date in @bestDates.dates)
                     {
                         <li>@date.ToString("dddd dd/MM/yy")</li>
