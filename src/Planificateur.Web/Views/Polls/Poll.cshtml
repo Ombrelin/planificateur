@@ -47,19 +47,19 @@
                                 <div class="control">
                                     <label class="radio">
                                         <input type="radio" required name="availability[@index]" value="Available"/>
-                                        ✅ <span class="vote-legend">Available</span>
+                                        <span class="ignore-dark-theme">✅</span> <span class="vote-legend">Available</span>
                                     </label>
                                 </div>
                                 <div class="control">
                                     <label class="radio">
                                         <input type="radio" required name="availability[@index]" value="Possible"/>
-                                        ❔ <span class="vote-legend">Possible</span>
+                                        <span class="ignore-dark-theme">❔</span> <span class="vote-legend">Possible</span>
                                     </label>
                                 </div>
                                 <div class="control">
                                     <label class="radio">
                                         <input type="radio" required name="availability[@index]" value="NotAvailable"/>
-                                        ❌ <span class="vote-legend">NotAvailable</span>
+                                        <span class="ignore-dark-theme">❌</span> <span class="vote-legend">NotAvailable</span>
                                     </label>
                                 </div>
                             </td>
@@ -70,14 +70,14 @@
                                         switch (vote.Availabilities[index])
                                         {
                                             case Availability.Available:
-                                                <text>✅</text>
+                                                <span class="ignore-dark-theme">✅</span>
                                                 break;
                                             case Availability.Possible:
-                                                <text> ❔
-                                                </text>
+                                                <span class="ignore-dark-theme"> ❔
+                                                </span>
                                                 break;
                                             case Availability.NotAvailable:
-                                                <text>❌</text>
+                                                <span class="ignore-dark-theme">❌</span>
                                                 break;
                                         }
 
@@ -92,16 +92,16 @@
                         <td></td>
                         <td>
 
-                            <button id="create-vote" class="button is-primary">Add Vote</button>
+                            <button id="create-vote" class="button is-primary ignore-dark-theme">Add Vote</button>
                         </td>
                         @if (@Model.Votes.Any())
                         {
                             @foreach (Vote vote in @Model.Votes)
                             {
                                 <td class="delete-vote">
-                                    <button type="button" class="button is-danger" onclick="deleteVote('@Model.Id' ,'@vote.Id')">
+                                    <button type="button" class="button is-danger ignore-dark-theme" onclick="deleteVote('@Model.Id' ,'@vote.Id')">
                                         <span class="icon">
-                                            <i class="fas fa-trash"></i>
+                                            <i class="fas fa-trash "></i>
                                         </span>
                                     </button>
                                 </td>

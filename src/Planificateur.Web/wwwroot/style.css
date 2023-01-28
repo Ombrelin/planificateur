@@ -22,6 +22,9 @@ ul {
     margin-bottom: 4rem;
 }
 
+
+
+
 @media only screen and (max-width: 600px) {
     
     .center {
@@ -48,4 +51,16 @@ ul {
     #create-vote {
         display: block;
     }
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+        filter: invert(.85);
+    }
+
+    .ignore-dark-theme {
+        filter: invert(.85);
+        color: black !important;
+    }
+
 }
