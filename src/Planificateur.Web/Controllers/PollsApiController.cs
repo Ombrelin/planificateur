@@ -37,13 +37,30 @@ public class PollsApiController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<Poll>> GetPoll(Guid id)
     {
-        return Ok(await pollApplication.GetPoll(id));
+        Poll? poll = await pollApplication.GetPoll(id);
+        if (poll is not null)
+        {
+            return Ok(poll);
+        }
+
+        return NotFound();
     }
     
+    [HttpPost("{pollId:guid}/votes")]
+    public async Task<ActionResult<Vote>> Vote(Guid pollId, [FromBody] CreateVoteRequest createVoteRequest)
+    {
+        return await pollApplication.Vote(pollId,createVoteRequest); 
+    }
+        
+    /// <summary>
+    /// Delete a vote from its id
+    /// </summary>
+    /// <param name="pollId">The id of the poll to which the vote belongs</param>
+    /// <param name="voteId">The id of the vote to delete</param>
     [HttpDelete("{id:guid}/votes/{voteId:guid}")]
-    public async Task<ActionResult<Poll>> GetPoll(Guid pollId, Guid voteId)
+    public async Task<ActionResult<Poll>> RemoveVote(Guid pollId, Guid voteId)
     {
         await pollApplication.RemoveVote(voteId);
-        return Ok();
+        return NoContent();
     }
 }

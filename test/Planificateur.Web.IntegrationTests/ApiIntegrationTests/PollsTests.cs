@@ -86,4 +86,99 @@ public class PollsTests : ApiIntegrationTests
         pollFromResponse.RootElement.GetProperty("expirationDate").GetDateTime().Should()
             .BeCloseTo(poll.ExpirationDate, TimeSpan.FromMilliseconds(50));
     }
+    
+    [Fact]
+    public async Task GetPoll_NonExistingPoll_Returns404()
+    {
+        // Given
+        var nonExistingPollId = Guid.NewGuid();
+        
+        // When
+        HttpResponseMessage response = await Client.GetAsync($"/api/polls/{nonExistingPollId}");
+        // Then
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    
+    [Fact]
+    public async Task DeleteVote_ExistingPoll_DeletesVoteFromDb()
+    {
+        // Given
+        var poll = new Poll
+        (
+            "Test Poll",
+            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+        );
+        var vote = new Vote(poll.Id, "Test Voter");
+        poll.Votes.Add(vote);
+        
+        await DbContext.Polls.AddAsync(poll);
+        await DbContext.SaveChangesAsync();
+
+        // When
+        HttpResponseMessage response = await Client.DeleteAsync($"/api/polls/{poll.Id}/votes/{vote.Id}");
+        
+        // Then
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        (await DbContext.Votes.CountAsync(voteRecord => voteRecord.Id == vote.Id)).Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Vote_ExistingPoll_InsertsVote()
+    {
+        // Given
+        var poll = new Poll
+        (
+            "Test Poll",
+            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+        );
+        await DbContext.Polls.AddAsync(poll);
+        await DbContext.SaveChangesAsync();
+
+        var voteRequest =
+            new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
+        
+        // When
+        HttpResponseMessage response = await Client.PostAsJsonAsync($"/api/polls/{poll.Id}/votes", voteRequest);
+        
+        // Then
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        using JsonDocument voteFromResponse = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+
+        string? voteId = voteFromResponse.RootElement.GetProperty("id").GetString();
+        voteId.Should().NotBeEmpty();
+        voteFromResponse.RootElement.GetProperty("voterName").GetString().Should().Be(voteRequest.VoterName);
+        voteFromResponse.RootElement.GetProperty("pollId").GetString().Should().Be(poll.Id.ToString());
+        var availabilities = voteFromResponse
+            .RootElement
+            .GetProperty("availabilities")
+            .EnumerateArray()
+            .AsEnumerable()
+            .Select(jsonElement => jsonElement.GetString())
+            .ToArray();
+
+        availabilities.Should().HaveCount(2);
+        availabilities[0].Should().Be(Availability.Available.ToString());
+        availabilities[1].Should().Be(Availability.NotAvailable.ToString());
+
+        var voteFromDb = await DbContext.Votes.FirstAsync(voteRecord => voteRecord.Id == Guid.Parse(voteId));
+        voteFromDb.Id.Should().Be(voteId);
+        voteFromDb.VoterName.Should().Be(voteRequest.VoterName);
+        voteFromDb.Availabilities.Should().BeEquivalentTo(new[] { Availability.Available, Availability.NotAvailable });
+        voteFromDb.PollId.Should().Be(poll.Id);
+    }
+    
+    [Fact]
+    public async Task Vote_NonExistingPoll_Returns404()
+    {
+        // Given
+        var voteRequest =
+            new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
+        
+        // When
+        HttpResponseMessage response = await Client.PostAsJsonAsync($"/api/polls/{Guid.NewGuid()}/votes", voteRequest);
+        
+        // Then
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
 }

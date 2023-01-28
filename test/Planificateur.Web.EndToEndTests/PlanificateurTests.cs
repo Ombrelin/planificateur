@@ -125,6 +125,25 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
         // Then
         await viewPollPageModel.VerifyNoVotes();
     }
+
+    [Fact]
+    public async Task AddVoteToPoll_RemembersNameForOtherPolls()
+    {
+        // Given
+        await AddVote_CreatesVote();
+        const string name = "Other Test Poll";
+        var dateTimes = new[] { DateTime.Today.AddDays(1), DateTime.Today.AddDays(3), DateTime.Today.AddDays(4) };
+        
+        await CreatePoll(name, dateTimes);
+        Guid pollId = Guid.Parse(page.Url.Split("/").Last());
+        var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
+        
+        // When
+        await viewPollPageModel.GotoAsync();
+        
+        // Then
+        await viewPollPageModel.VerifyNameFieldFilled("Test Voter");
+    }
     
     [Fact]
     public async Task AddVote_CreatesVote()

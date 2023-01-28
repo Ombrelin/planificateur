@@ -43,6 +43,20 @@ const fillTimezoneInForm = () => {
     timezoneInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
+const saveVoterName = () => {
+    const voterNameField = document.querySelector("#voter-name") as HTMLInputElement;
+    
+    localStorage.setItem("voterName", voterNameField.value);
+}
+
+const loadVoterName = () => {
+    const voterName = localStorage.getItem("voterName");
+    if(voterName){
+        const voterNameField = document.querySelector("#voter-name") as HTMLInputElement;
+        voterNameField.value = voterName;
+    }
+}
+
 const removeDate = (element: HTMLElement) => {
     element.parentElement?.parentElement?.remove();
 }

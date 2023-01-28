@@ -104,4 +104,9 @@ public class ViewPollPageObjectModel : PageObjectModel
     {
         (await Page.QuerySelectorAllAsync($"thead>tr>th")).Should().HaveCount(2);
     }
+
+    public async Task VerifyNameFieldFilled(string name)
+    {
+        (await (await Page.QuerySelectorAsync("#voter-name"))!.InputValueAsync()).Should().Be(name);
+    }
 }

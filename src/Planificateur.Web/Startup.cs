@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Npgsql;
@@ -23,7 +24,11 @@ public class Startup
     {
         services
             .AddControllers()
-            .AddJsonOptions(options => options.JsonSerializerOptions.AddContext<SourceGenerationSerialiser>());
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.AddContext<SourceGenerationSerialiser>();
+            });
         services.AddMvc();
         services.AddScoped<IPollsRepository, PollsRepository>();
         services.AddScoped<IVotesRepository, VotesRepository>();

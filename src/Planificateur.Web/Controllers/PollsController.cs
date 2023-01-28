@@ -8,7 +8,7 @@ using Planificateur.Core.Entities;
 namespace Planificateur.Web.Controllers;
 
 [Route("polls")]
-[ApiExplorerSettings(IgnoreApi=true)]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class PollsController : Controller
 {
     private readonly PollApplication pollApplication;
@@ -27,7 +27,6 @@ public class PollsController : Controller
     [HttpPost("create")]
     public async Task<IActionResult> CreatePollFormSubmit(CreatePollRequest createPollRequest, IFormCollection data)
     {
-
         if (!ModelState.IsValid)
         {
             ViewBag.Errors = ModelState
@@ -37,7 +36,7 @@ public class PollsController : Controller
                 .Where(error => error is not null);
             return View("Views/Polls/Create.cshtml");
         }
-        
+
         StringValues timezone = data.First(kvp => kvp.Key is "timezone").Value;
         TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timezone);
 
@@ -48,7 +47,7 @@ public class PollsController : Controller
                 .Select(date => TimeZoneInfo.ConvertTimeToUtc(date, timeZoneInfo))
                 .ToList()
         });
-        
+
         return Redirect($"/polls/{poll.Id}");
     }
 
@@ -62,18 +61,14 @@ public class PollsController : Controller
     [HttpPost("{id:guid}/votes")]
     public async Task<IActionResult> AddVote(Guid id, IFormCollection data)
     {
-        var vote = new Vote
-        (
-            id, 
-            data["voterName"]
-        )
-        {
-            Availabilities = data
+        var vote = new CreateVoteRequest(
+            data["voterName"], 
+            data
                 .Where(formData => formData.Key.Contains("availability"))
                 .Select(value => Enum.Parse<Availability>(value.Value))
                 .ToList()
-        };
-        await pollApplication.Vote(vote);
+        );
+        await pollApplication.Vote(id, vote);
         return Redirect($"/polls/{id}");
     }
 }

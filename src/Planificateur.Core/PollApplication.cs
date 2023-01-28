@@ -34,7 +34,15 @@ public class PollApplication
         return poll;
     }
 
-    public Task Vote(Vote vote) => this.votesRepository.Save(vote);
+    public async Task<Vote> Vote(Guid pollId, CreateVoteRequest createVoteRequest)
+    {
+        var vote = new Vote(pollId, createVoteRequest.VoterName)
+        {
+            Availabilities = createVoteRequest.Availabilities.ToList()
+        };
+        await this.votesRepository.Save(vote);
+        return vote;
+    }
 
     public async Task RemoveVote(Guid voteId)
     {
