@@ -11,7 +11,8 @@ public class PollsApplicationTests
     public async Task CreatePoll_InsertsPollInDb()
     {
         // Given
-        var createPollRequest = new CreatePollRequest("Test Poll", DateTime.UtcNow, new List<DateTime> { DateTime.UtcNow });
+        var createPollRequest =
+            new CreatePollRequest("Test Poll", DateTime.UtcNow, new List<DateTime> { DateTime.UtcNow });
         var pollRepository = new FakePollsRepository();
         var application = new PollApplication(pollRepository, new FakeVotesRepository());
 
@@ -60,11 +61,9 @@ public class PollsApplicationTests
         var fakeVotesRepository = new FakeVotesRepository();
         var application = new PollApplication(pollRepository, fakeVotesRepository);
 
-        var vote = new Vote(poll.Id,
-            "Test Voter Name"
-        )
-        {
-            Availabilities = new List<Availability>
+        var createVoteRequest = new CreateVoteRequest(
+            "Test Voter Name",
+            new List<Availability>
             {
                 Availability.Available,
                 Availability.Available,
@@ -72,13 +71,35 @@ public class PollsApplicationTests
                 Availability.NotAvailable,
                 Availability.Available,
             }
-        };
+        );
 
         // When
-        await application.Vote(vote);
+        var vote = await application.Vote(poll.Id, createVoteRequest);
 
         // Then
-        fakeVotesRepository.Data.First().Value.Should().Be(vote);
+        vote.PollId.Should().Be(poll.Id);
+        vote.Id.Should().Be(vote.Id);
+        vote.VoterName.Should().Be(createVoteRequest.VoterName);
+        vote.Availabilities.Should().BeEquivalentTo(new List<Availability>
+        {
+            Availability.Available,
+            Availability.Available,
+            Availability.NotAvailable,
+            Availability.NotAvailable,
+            Availability.Available,
+        });
+        var pollInDb = fakeVotesRepository.Data[vote.Id];
+        pollInDb.PollId.Should().Be(poll.Id);
+        pollInDb.Id.Should().Be(vote.Id);
+        pollInDb.VoterName.Should().Be(createVoteRequest.VoterName);
+        pollInDb.Availabilities.Should().BeEquivalentTo(new List<Availability>
+        {
+            Availability.Available,
+            Availability.Available,
+            Availability.NotAvailable,
+            Availability.NotAvailable,
+            Availability.Available,
+        });
     }
 
     [Fact]
