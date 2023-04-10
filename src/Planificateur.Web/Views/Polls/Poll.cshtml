@@ -1,9 +1,11 @@
+@using System.Globalization
 @using Planificateur.Core.Entities
 @model Planificateur.Core.Entities.Poll?
 
 @{
     Layout = "Layout";
     ViewData["Title"] = $"Poll - {(Model is null ? "Not Found" : Model.Name)}";
+    var culture = (CultureInfo) ViewData["culture"];
 }
 
 <div class="center">
@@ -42,7 +44,7 @@
                     @foreach ((DateTime date, int index) in @Model.Dates.Select((elt, index) => (elt,index)))
                     {
                         <tr class="date-row">
-                            <td class="date-cell">@date.ToString("dddd dd/MM/yy")</td>
+                            <td class="date-cell" data-year="@date.Year" data-month="@date.Month" data-day="@date.Day" data-hour="@date.Hour" data-minute="@date.Minute"></td>
                             <td>
                                 <div class="control">
                                     <label class="radio">
@@ -140,4 +142,5 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", loadVoterName);
+document.addEventListener("DOMContentLoaded", loadLocalDates);
 </script>

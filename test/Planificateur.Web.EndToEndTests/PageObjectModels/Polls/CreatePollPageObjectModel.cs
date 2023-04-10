@@ -45,10 +45,11 @@ public class CreatePageObjectModel : PageObjectModel
         await Page.ClickAsync("#create");
     }
     
-    public async Task CheckDateExistInForm(List<DateTime> dates)
+    public async Task CheckDateExistInForm(List<DateTime> dates, TimeOnly? time = null)
     {
-        List<IElementHandle> inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
-        while (inputs.Count < 4)
+        TimeOnly rangeTime = time ?? TimeOnly.FromTimeSpan(TimeSpan.FromHours(12));
+        var inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
+        while (inputs.Count < dates.Count)
         {
             await Task.Delay(TimeSpan.FromMilliseconds(10));
             inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
@@ -59,12 +60,14 @@ public class CreatePageObjectModel : PageObjectModel
         {
             string inputValue = await input.InputValueAsync();
             
-            Assert.Contains(dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), inputValue);
+            Assert.Contains($"{dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T{rangeTime.ToString("HH:mm")}", inputValue);
         }
     }
     
-    public async Task AddDateRange(DateTime startDate, DateTime endDate)
+    public async Task AddDateRange(DateTime startDate, DateTime endDate, TimeOnly? time = null)
     {
+        TimeOnly rangeTime = time ?? TimeOnly.FromTimeSpan(TimeSpan.FromHours(12));
+        
         var summary = await Page.QuerySelectorAsync("summary");
         await summary!.ClickAsync();
         
@@ -73,6 +76,9 @@ public class CreatePageObjectModel : PageObjectModel
 
         await rangeStartDate!.FillAsync(startDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
         await rangeEndDate!.FillAsync(endDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+
+        var rangeTimeInput = await Page.QuerySelectorAsync("#range-time");
+        await rangeTimeInput!.FillAsync(rangeTime.ToString("HH:mm"));
         
         var addDateRateButton = await Page.QuerySelectorAsync("#add-date-range");
         await addDateRateButton!.ClickAsync();

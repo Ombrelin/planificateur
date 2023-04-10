@@ -78,6 +78,7 @@ public class Startup
         {
             app.UseDeveloperExceptionPage();
         }
+        app.UseRequestLocalization();
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {

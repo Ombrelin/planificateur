@@ -46,6 +46,12 @@ public class PollsApiController : ControllerBase
         return NotFound();
     }
     
+    /// <summary>
+    /// Add a vote to a poll.
+    /// </summary>
+    /// <param name="pollId">Id of the poll to which add a vote.</param>
+    /// <param name="createVoteRequest">Vote to add.</param>
+    /// <returns>The created vote.</returns>
     [HttpPost("{pollId:guid}/votes")]
     public async Task<ActionResult<Vote>> Vote(Guid pollId, [FromBody] CreateVoteRequest createVoteRequest)
     {

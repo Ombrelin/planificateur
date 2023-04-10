@@ -72,7 +72,7 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
         // Then
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
-        await viewPollPageModel.VerifyTitleAndDates(name, dateTimes);
+        await viewPollPageModel.VerifyTitleAndDates(name, dateTimes.Select(date => new DateTime(date.Year, date.mo)));
     }
 
     [Fact]
@@ -228,7 +228,7 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
     {
         var createPageObjectModel = new CreatePageObjectModel(page, serverAddress);
         await createPageObjectModel.GotoAsync();
-        await createPageObjectModel.AddDates(2);
+        await createPageObjectModel.AddDates(dateTimes.Length - 1);
         await createPageObjectModel.SubmitPoll(name, dateTimes);
     }
 }
