@@ -72,7 +72,7 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
         // Then
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
-        await viewPollPageModel.VerifyTitleAndDates(name, dateTimes.Select(date => new DateTime(date.Year, date.mo)));
+        await viewPollPageModel.VerifyTitleAndDates(name, dateTimes);
     }
 
     [Fact]

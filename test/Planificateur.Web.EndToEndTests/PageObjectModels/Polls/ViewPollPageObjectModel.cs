@@ -16,30 +16,25 @@ public class ViewPollPageObjectModel : PageObjectModel
 
     public override string Path => $"polls/{pollId}";
 
-    public async Task VerifyTitleAndDates(string pollName, DateTime[] dateTimes)
+    public async Task VerifyTitleAndDates(string pollName, IReadOnlyCollection<DateTime> dateTimes)
     {
         IElementHandle? titleTag = await Page.QuerySelectorAsync("h1");
         string title = await titleTag!.InnerTextAsync();
 
         title.Should().Be(pollName);
 
-        var formattedDates = dateTimes
-            .Select(dateTime => dateTime.ToString("dddd, dd/MM/yy"))
+        var formattedDatetimes = dateTimes
+            .Select(dateTime => (date: dateTime.ToString("dddd, MM/dd/yyyy"), time: dateTime.ToString("hh:mm")))
             .ToList();
-        
+
         var tableCells = await Page.QuerySelectorAllAsync("tbody>tr>td.date-cell");
         string?[] tableCellsText = await Task.WhenAll(tableCells
             .Select(async cell => await cell.TextContentAsync()));
         
         tableCellsText
-            .Where(cellText => formattedDates.SingleOrDefault(cellText.Contains) is not null && )
+            .Where(cellText => formattedDatetimes.Any(date => cellText.Contains(date.date) && cellText.Contains(date.time)))
             .Should()
-            .HaveCount(dateTimes.Length);
-
-        foreach (var (dateCellText, index) in tableCellsText.Select((elt, index) => (elt,index)))
-        {
-            dateCellText.Should().Be(formattedDates[index]);
-        }
+            .HaveCount(dateTimes.Count);
     }
 
     public async Task AddVote(Vote vote)

@@ -83,7 +83,7 @@ const fillLocalizedDate = (td: HTMLElement) => {
     const utcDate = new Date(
         Date.UTC(
             Number.parseInt(td.dataset.year ?? "0"), 
-            Number.parseInt(td.dataset.month ?? "0") + 1,
+            Number.parseInt(td.dataset.month ?? "0") - 1,
             Number.parseInt(td.dataset.day ?? "0"), 
             Number.parseInt(td.dataset.hour ?? "0"),
             Number.parseInt(td.dataset.minute ?? "0")
