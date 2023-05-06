@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Web.Integrati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Web.EndToEndTests", "test\Planificateur.Web.EndToEndTests\Planificateur.Web.EndToEndTests.csproj", "{8650026C-CA08-4FB5-BDD4-D90D8CCA0F02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Tests.Shared", "test\Planificateur.Tests.Shared\Planificateur.Tests.Shared.csproj", "{EE70130A-70B7-44FB-987C-1594BEDD7571}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{8650026C-CA08-4FB5-BDD4-D90D8CCA0F02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8650026C-CA08-4FB5-BDD4-D90D8CCA0F02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8650026C-CA08-4FB5-BDD4-D90D8CCA0F02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE70130A-70B7-44FB-987C-1594BEDD7571}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE70130A-70B7-44FB-987C-1594BEDD7571}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE70130A-70B7-44FB-987C-1594BEDD7571}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE70130A-70B7-44FB-987C-1594BEDD7571}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

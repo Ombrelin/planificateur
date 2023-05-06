@@ -8,6 +8,10 @@ namespace Planificateur.Web.Json;
 [JsonSerializable(typeof(Poll))]
 [JsonSerializable(typeof(object))]
 [JsonSerializable(typeof(CreateVoteRequest))]
+[JsonSerializable(typeof(RegisterRequest))]
+[JsonSerializable(typeof(RegisterResponse))]
+[JsonSerializable(typeof(LoginRequest))]
+[JsonSerializable(typeof(LoginResponse))]
 internal partial class SourceGenerationSerialiser : JsonSerializerContext
 {
     

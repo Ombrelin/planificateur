@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -8,6 +9,7 @@ using Planificateur.Core.Entities;
 
 namespace Planificateur.Web.Controllers;
 
+[AllowAnonymous]
 [Route("polls")]
 [ApiExplorerSettings(IgnoreApi = true)]
 public class PollsController : Controller

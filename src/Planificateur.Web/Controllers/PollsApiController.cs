@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Planificateur.Core;
@@ -6,6 +7,7 @@ using Planificateur.Core.Entities;
 
 namespace Planificateur.Web.Controllers;
 
+[AllowAnonymous]
 [Route("api/polls")]
 [Tags("Polls")]
 public class PollsApiController : ControllerBase
@@ -61,8 +63,8 @@ public class PollsApiController : ControllerBase
     /// <summary>
     /// Delete a vote from its id
     /// </summary>
-    /// <param name="pollId">The id of the poll to which the vote belongs</param>
-    /// <param name="voteId">The id of the vote to delete</param>
+    /// <param name="pollId">The id of the poll to which the vote belongs.</param>
+    /// <param name="voteId">The id of the vote to delete.</param>
     [HttpDelete("{id:guid}/votes/{voteId:guid}")]
     public async Task<ActionResult<Poll>> RemoveVote(Guid pollId, Guid voteId)
     {

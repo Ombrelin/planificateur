@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Planificateur.Tests.Shared;
 using Planificateur.Web.Database;
 using Planificateur.Web.Tests.Database;
 
@@ -8,6 +9,7 @@ public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
 {
     protected HttpClient Client;
     protected ApplicationDbContext DbContext;
+    protected DataFactory DataFactory = new();
 
     public ApiIntegrationTests(WebApplicationFactory<Startup> webApplicationFactory, DatabaseFixture databaseFixture)
     {

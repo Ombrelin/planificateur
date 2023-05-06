@@ -24,6 +24,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Planificateur.Core\Planificateur.Core.csproj" />
+      <ProjectReference Include="..\Planificateur.Tests.Shared\Planificateur.Tests.Shared.csproj" />
     </ItemGroup>
 
 </Project>
