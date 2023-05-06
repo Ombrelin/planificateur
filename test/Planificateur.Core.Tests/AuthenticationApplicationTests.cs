@@ -48,7 +48,7 @@ public class AuthenticationApplicationTests
         
         // When
         var act = async () => await target.Register(
-            new RegisterRequest(dataFactory.Username, dataFactory.Password)
+            new RegisterRequest(user.Username, dataFactory.Password)
         );
 
         // Then
@@ -75,7 +75,7 @@ public class AuthenticationApplicationTests
 
         // When
         LoginResponse response = await target.Login(
-            new LoginRequest(applicationUser.Username, applicationUser.Password)
+            new LoginRequest(applicationUser.Username, dataFactory.Password)
         );
 
         // Then
