@@ -21,5 +21,6 @@ services:
       - DB_PASSWORD=password
       - DB_PORT=5432
       - DB_USERNAME=postgres
+      - JWT_SECRET=this-is-a-secret-dont-tell-anyone
     ports: 
       - 5000:80
