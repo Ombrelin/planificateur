@@ -32,7 +32,7 @@ public class AuthenticationApplication
         {
             throw new ArgumentException("User already exists");
         }
-        
+
         await this.repository.Insert(applicationUser);
 
         return new RegisterResponse(
@@ -48,7 +48,8 @@ public class AuthenticationApplication
 
     public async Task<LoginResponse> Login(LoginRequest request)
     {
-        ApplicationUser applicationUser = await repository.FindByUsername(request.Username) ?? throw new NotFoundException("Not such user");
+        ApplicationUser applicationUser = await repository.FindByUsername(request.Username) ??
+                                          throw new NotFoundException("Not such user");
         if (!applicationUser.VerifyPassword(request.Password))
         {
             throw new ArgumentException("Passwords do not match");

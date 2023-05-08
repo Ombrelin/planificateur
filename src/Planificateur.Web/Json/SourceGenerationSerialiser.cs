@@ -14,5 +14,4 @@ namespace Planificateur.Web.Json;
 [JsonSerializable(typeof(LoginResponse))]
 internal partial class SourceGenerationSerialiser : JsonSerializerContext
 {
-    
 }

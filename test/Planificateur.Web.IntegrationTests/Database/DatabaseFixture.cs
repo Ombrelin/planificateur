@@ -4,15 +4,15 @@ using Planificateur.Web.Database;
 
 namespace Planificateur.Web.Tests.Database;
 
-public class DatabaseFixture : IAsyncLifetime {
-    public  ApplicationDbContext DbContext { get; }
+public class DatabaseFixture : IAsyncLifetime
+{
+    public ApplicationDbContext DbContext { get; }
 
     public DatabaseFixture()
     {
-
         DbContext = BuildNewDbContext();
     }
-    
+
     public static ApplicationDbContext BuildNewDbContext()
     {
         var builder = new NpgsqlConnectionStringBuilder

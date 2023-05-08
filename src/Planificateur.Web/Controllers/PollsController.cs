@@ -1,6 +1,4 @@
-using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Planificateur.Core;
@@ -65,7 +63,7 @@ public class PollsController : Controller
     public async Task<IActionResult> AddVote(Guid id, IFormCollection data)
     {
         var vote = new CreateVoteRequest(
-            data["voterName"], 
+            data["voterName"],
             data
                 .Where(formData => formData.Key.Contains("availability"))
                 .Select(value => Enum.Parse<Availability>(value.Value))

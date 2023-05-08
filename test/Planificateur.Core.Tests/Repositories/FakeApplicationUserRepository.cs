@@ -5,7 +5,6 @@ namespace Planificateur.Core.Tests.Repositories;
 
 public class FakeApplicationUserRepository : IApplicationUsersRepository
 {
-
     public readonly Dictionary<Guid, ApplicationUser> Data = new();
 
     public Task Insert(ApplicationUser entity)

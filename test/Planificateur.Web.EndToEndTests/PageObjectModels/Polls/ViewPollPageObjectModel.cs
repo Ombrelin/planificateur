@@ -8,7 +8,7 @@ namespace Planificateur.Web.EndToEndTests.PageObjectModels.Polls;
 public class ViewPollPageObjectModel : PageObjectModel
 {
     private readonly Guid pollId;
-    
+
     public ViewPollPageObjectModel(IPage page, string baseAppUrl, Guid pollId) : base(page, baseAppUrl)
     {
         this.pollId = pollId;
@@ -30,9 +30,10 @@ public class ViewPollPageObjectModel : PageObjectModel
         var tableCells = await Page.QuerySelectorAllAsync("tbody>tr>td.date-cell");
         string?[] tableCellsText = await Task.WhenAll(tableCells
             .Select(async cell => await cell.TextContentAsync()));
-        
+
         tableCellsText
-            .Where(cellText => formattedDatetimes.Any(date => cellText.Contains(date.date) && cellText.Contains(date.time)))
+            .Where(cellText =>
+                formattedDatetimes.Any(date => cellText.Contains(date.date) && cellText.Contains(date.time)))
             .Should()
             .HaveCount(dateTimes.Count);
     }
@@ -41,13 +42,15 @@ public class ViewPollPageObjectModel : PageObjectModel
     {
         var nameInput = await Page.QuerySelectorAsync("#voter-name");
         await nameInput!.FillAsync(vote.VoterName);
-        
+
         foreach ((IElementHandle dateRow, int index) in await GetElementsWithIndex("tbody>tr.date-row"))
         {
             var availability = vote.Availabilities[index];
-            var radioButton = await dateRow.QuerySelectorAsync($"""input[type="radio"][name="availability[{index}]"][value="{availability.ToString()}"]""" );
+            var radioButton = await dateRow.QuerySelectorAsync(
+                $"""input[type="radio"][name="availability[{index}]"][value="{availability.ToString()}"]""");
             await radioButton!.ClickAsync();
         }
+
         var submit = await Page.QuerySelectorAsync("#create-vote");
         await submit!.ClickAsync();
     }
@@ -65,7 +68,7 @@ public class ViewPollPageObjectModel : PageObjectModel
         var voterNameHeader = selectorAllAsync[^1];
         var voterNameText = await voterNameHeader.TextContentAsync();
         voterNameText.Should().Be(vote.VoterName);
-        
+
         foreach (IElementHandle dateRow in await Page.QuerySelectorAllAsync("tbody>tr.date-row"))
         {
             var querySelectorAllAsync = await dateRow.QuerySelectorAllAsync("td");
@@ -77,7 +80,6 @@ public class ViewPollPageObjectModel : PageObjectModel
 
     public async Task VerifyBestDates(IList<DateTime> dateTimes)
     {
-        
         var bestDates = (await GetElementsWithIndex("#best-dates>ul>li"))
             .ToList();
         bestDates.Should().HaveCount(dateTimes.Count);

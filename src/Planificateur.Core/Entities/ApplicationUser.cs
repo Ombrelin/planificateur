@@ -21,8 +21,9 @@ public class ApplicationUser
         Password = password;
     }
 
-    
+
     public string Password { get; }
+
     public ApplicationUser(string creationUsername, string creationPassword)
     {
         Id = Guid.NewGuid();
@@ -42,6 +43,7 @@ public class ApplicationUser
         {
             throw new ArgumentException("Password should at least have a length of 5");
         }
+
         if (!passwordToValidate.Any(char.IsDigit))
         {
             throw new ArgumentException("Password must contain a digit");
@@ -51,6 +53,7 @@ public class ApplicationUser
         {
             throw new ArgumentException("Password must contain an uppercase letter");
         }
+
         if (!passwordToValidate.Any(char.IsAsciiLetterLower))
         {
             throw new ArgumentException("Password must contain a lowercase letter");

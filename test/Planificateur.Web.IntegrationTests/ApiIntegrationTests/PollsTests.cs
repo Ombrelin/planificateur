@@ -4,11 +4,8 @@ using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
-using Planificateur.Web.Database;
-using Planificateur.Web.Json;
 using Planificateur.Web.Tests.Database;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
@@ -86,20 +83,20 @@ public class PollsTests : ApiIntegrationTests
         pollFromResponse.RootElement.GetProperty("expirationDate").GetDateTime().Should()
             .BeCloseTo(poll.ExpirationDate, TimeSpan.FromMilliseconds(50));
     }
-    
+
     [Fact]
     public async Task GetPoll_NonExistingPoll_Returns404()
     {
         // Given
         var nonExistingPollId = Guid.NewGuid();
-        
+
         // When
         HttpResponseMessage response = await Client.GetAsync($"/api/polls/{nonExistingPollId}");
         // Then
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    
+
     [Fact]
     public async Task DeleteVote_ExistingPoll_DeletesVoteFromDb()
     {
@@ -111,13 +108,13 @@ public class PollsTests : ApiIntegrationTests
         );
         var vote = new Vote(poll.Id, "Test Voter");
         poll.Votes.Add(vote);
-        
+
         await DbContext.Polls.AddAsync(poll);
         await DbContext.SaveChangesAsync();
 
         // When
         HttpResponseMessage response = await Client.DeleteAsync($"/api/polls/{poll.Id}/votes/{vote.Id}");
-        
+
         // Then
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         (await DbContext.Votes.CountAsync(voteRecord => voteRecord.Id == vote.Id)).Should().Be(0);
@@ -137,10 +134,10 @@ public class PollsTests : ApiIntegrationTests
 
         var voteRequest =
             new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
-        
+
         // When
         HttpResponseMessage response = await Client.PostAsJsonAsync($"/api/polls/{poll.Id}/votes", voteRequest);
-        
+
         // Then
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         using JsonDocument voteFromResponse = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
@@ -167,17 +164,17 @@ public class PollsTests : ApiIntegrationTests
         voteFromDb.Availabilities.Should().BeEquivalentTo(new[] { Availability.Available, Availability.NotAvailable });
         voteFromDb.PollId.Should().Be(poll.Id);
     }
-    
+
     [Fact(Skip = "404 not handled")]
     public async Task Vote_NonExistingPoll_Returns404()
     {
         // Given
         var voteRequest =
             new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
-        
+
         // When
         HttpResponseMessage response = await Client.PostAsJsonAsync($"/api/polls/{Guid.NewGuid()}/votes", voteRequest);
-        
+
         // Then
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

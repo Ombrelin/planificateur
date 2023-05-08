@@ -8,7 +8,7 @@ namespace Planificateur.Web.Controllers;
 [AllowAnonymous]
 [ApiController]
 [Route("/api/authentication")]
-public class AuthenticationController: ControllerBase
+public class AuthenticationController : ControllerBase
 {
     private readonly AuthenticationApplication application;
 
@@ -16,7 +16,7 @@ public class AuthenticationController: ControllerBase
     {
         this.application = application;
     }
-    
+
     /// <summary>
     /// Register a new user.
     /// </summary>

@@ -14,7 +14,7 @@ public record CreateVoteRequest(
     /// John Doe
     /// </example>
     public string VoterName { get; } = VoterName;
-    
+
     /// <summary>
     /// Availabilities of the voter for the poll dates.
     /// Item in this collection correspond to dates of the poll.

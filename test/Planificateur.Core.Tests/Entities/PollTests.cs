@@ -12,7 +12,7 @@ public class PollTests
         var guid = Guid.NewGuid();
 
         // When
-        var poll = new Poll(guid,"Test Name", new List<DateTime> { DateTime.UtcNow });
+        var poll = new Poll(guid, "Test Name", new List<DateTime> { DateTime.UtcNow });
 
         // Then
         poll.Id.Should().Be(guid);

@@ -10,13 +10,14 @@ using Planificateur.Web.Tests.Database;
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
 [Collection("Database Tests")]
-public class AuthenticationTests: ApiIntegrationTests
+public class AuthenticationTests : ApiIntegrationTests
 {
-    public AuthenticationTests(WebApplicationFactory<Startup> webApplicationFactory, DatabaseFixture databaseFixture) : base(
+    public AuthenticationTests(WebApplicationFactory<Startup> webApplicationFactory,
+        DatabaseFixture databaseFixture) : base(
         webApplicationFactory, databaseFixture)
     {
     }
-    
+
     [Fact]
     public async Task Register_InsertsNewUserInDb()
     {
@@ -40,7 +41,7 @@ public class AuthenticationTests: ApiIntegrationTests
         userInDb.Username.Should().Be(request.Username);
         userInDb.Password.Should().NotBeEmpty();
     }
-    
+
     [Fact]
     public async Task Login_WithCorrectCredentials_ReturnsToken()
     {
@@ -74,7 +75,7 @@ public class AuthenticationTests: ApiIntegrationTests
         // Then
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     private async Task<ApplicationUser> InsertTestApplicationUser()
     {
         ApplicationUser user = DataFactory.BuildTestUser();
@@ -82,5 +83,4 @@ public class AuthenticationTests: ApiIntegrationTests
         await DbContext.SaveChangesAsync();
         return user;
     }
-
 }

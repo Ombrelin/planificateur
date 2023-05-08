@@ -5,7 +5,7 @@
 @{
     Layout = "Layout";
     ViewData["Title"] = $"Poll - {(Model is null ? "Not Found" : Model.Name)}";
-    var culture = (CultureInfo) ViewData["culture"];
+    var culture = (CultureInfo)ViewData["culture"];
 }
 
 <div class="center">
@@ -75,7 +75,8 @@
                                                 <span class="ignore-dark-theme">✅</span>
                                                 break;
                                             case Availability.Possible:
-                                                <span class="ignore-dark-theme"> ❔
+                                                <span class="ignore-dark-theme">
+                                                    ❔
                                                 </span>
                                                 break;
                                             case Availability.NotAvailable:

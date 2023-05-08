@@ -11,7 +11,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Poll> Polls { get; set; }
     public DbSet<Vote> Votes { get; set; }
-    
+
     public DbSet<ApplicationUser> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -52,5 +52,4 @@ public class ApplicationDbContext : DbContext
             }
         );
     }
-
 }

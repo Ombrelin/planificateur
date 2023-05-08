@@ -1,11 +1,11 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using FluentAssertions;
+using Microsoft.IdentityModel.Tokens;
 using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
 using Planificateur.Core.Tests.Repositories;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using Planificateur.Tests.Shared;
 
 namespace Planificateur.Core.Tests;
@@ -13,7 +13,7 @@ namespace Planificateur.Core.Tests;
 public class AuthenticationApplicationTests
 {
     private readonly DataFactory dataFactory = new();
-    
+
     private const string JwtSecret = "my-secret-string-to-sign-jwt-token";
     private readonly FakeApplicationUserRepository fakeRepository = new();
     private readonly AuthenticationApplication target;
@@ -45,7 +45,7 @@ public class AuthenticationApplicationTests
         // Given
         ApplicationUser user = dataFactory.BuildTestUser();
         await fakeRepository.Insert(user);
-        
+
         // When
         var act = async () => await target.Register(
             new RegisterRequest(user.Username, dataFactory.Password)
@@ -55,7 +55,7 @@ public class AuthenticationApplicationTests
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
-    
+
     [Fact]
     public async Task Login_GoodCredentials_ReturnsJwtToken()
     {

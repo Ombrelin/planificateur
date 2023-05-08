@@ -84,7 +84,7 @@ public class ApplicationUserTests
 
         // When
         bool result = user.VerifyPassword(password);
-        
+
         // Then
         result.Should().BeTrue();
     }
@@ -99,7 +99,7 @@ public class ApplicationUserTests
 
         // When
         bool result = user.VerifyPassword("not the right password");
-        
+
         // Then
         result.Should().BeFalse();
     }

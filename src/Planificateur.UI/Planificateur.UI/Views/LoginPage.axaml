@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Planificateur.UI.ViewModels.ViewModels;assembly=Planificateur.UI.ViewModels"
+             mc:Ignorable="d"
+             x:Class="Planificateur.UI.Views.LoginPage"
+             x:DataType="viewModels:LoginPageViewModel">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>*,.5*,*,*,*,*</Grid.RowDefinitions>
+        <Label FontSize="24" Width="200" HorizontalContentAlignment="Center" HorizontalAlignment="Center">Login to Planificateur</Label>
+        <StackPanel Grid.Row="1">
+            <Image Width="150" Height="150" VerticalAlignment="Center" Source="/Assets/avalonia-logo.ico" />
+        </StackPanel>
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>*,*,*</Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Label>Server URL :</Label>
+                <TextBox Text="{CompiledBinding ServerUrl}" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Label>Username :</Label>
+                <TextBox Text="{CompiledBinding Username}" />
+            </StackPanel>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Label>Password :</Label>
+                <TextBox PasswordChar="•" Text="{CompiledBinding Password}" />
+            </StackPanel>
+            <Button
+                Grid.Row="2"
+                Command="{Binding LoginCommand}"
+                HorizontalAlignment="Center">
+                Login
+            </Button>
+        </Grid>
+
+    </Grid>
+
+</UserControl>

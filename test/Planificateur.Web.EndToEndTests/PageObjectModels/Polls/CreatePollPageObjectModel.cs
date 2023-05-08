@@ -17,21 +17,21 @@ public class CreatePageObjectModel : PageObjectModel
     {
         foreach (int _ in Enumerable.Range(1, numberOfDates))
         {
-            await Page.ClickAsync("#add-date");  
+            await Page.ClickAsync("#add-date");
         }
     }
 
     public async Task SubmitPoll(string name, DateTime[] dates)
     {
         await FillPollName(name);
-        
+
         var inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
         inputs.Count.Should().Be(dates.Length);
         foreach ((IElementHandle input, int index) in inputs.Select((element, index) => (element, index)))
         {
             await input.FillAsync(dates[index].ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture));
         }
-        
+
         await SubmitPoll();
     }
 
@@ -44,7 +44,7 @@ public class CreatePageObjectModel : PageObjectModel
     {
         await Page.ClickAsync("#create");
     }
-    
+
     public async Task CheckDateExistInForm(List<DateTime> dates, TimeOnly? time = null)
     {
         TimeOnly rangeTime = time ?? TimeOnly.FromTimeSpan(TimeSpan.FromHours(12));
@@ -54,23 +54,26 @@ public class CreatePageObjectModel : PageObjectModel
             await Task.Delay(TimeSpan.FromMilliseconds(10));
             inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
         }
+
         Assert.Equal(dates.Count, inputs.Count);
 
         foreach ((IElementHandle input, int index) in inputs.Select((item, index) => (item, index)))
         {
             string inputValue = await input.InputValueAsync();
-            
-            Assert.Contains($"{dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T{rangeTime.ToString("HH:mm")}", inputValue);
+
+            Assert.Contains(
+                $"{dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T{rangeTime.ToString("HH:mm")}",
+                inputValue);
         }
     }
-    
+
     public async Task AddDateRange(DateTime startDate, DateTime endDate, TimeOnly? time = null)
     {
         TimeOnly rangeTime = time ?? TimeOnly.FromTimeSpan(TimeSpan.FromHours(12));
-        
+
         var summary = await Page.QuerySelectorAsync("summary");
         await summary!.ClickAsync();
-        
+
         var rangeStartDate = await Page.QuerySelectorAsync("#range-start-date");
         var rangeEndDate = await Page.QuerySelectorAsync("#range-end-date");
 
@@ -79,7 +82,7 @@ public class CreatePageObjectModel : PageObjectModel
 
         var rangeTimeInput = await Page.QuerySelectorAsync("#range-time");
         await rangeTimeInput!.FillAsync(rangeTime.ToString("HH:mm"));
-        
+
         var addDateRateButton = await Page.QuerySelectorAsync("#add-date-range");
         await addDateRateButton!.ClickAsync();
     }

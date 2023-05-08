@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Planificateur.Core;
 using Planificateur.Core.Contracts;
@@ -47,7 +46,7 @@ public class PollsApiController : ControllerBase
 
         return NotFound();
     }
-    
+
     /// <summary>
     /// Add a vote to a poll.
     /// </summary>
@@ -57,9 +56,9 @@ public class PollsApiController : ControllerBase
     [HttpPost("{pollId:guid}/votes")]
     public async Task<ActionResult<Vote>> Vote(Guid pollId, [FromBody] CreateVoteRequest createVoteRequest)
     {
-        return await pollApplication.Vote(pollId,createVoteRequest); 
+        return await pollApplication.Vote(pollId, createVoteRequest);
     }
-        
+
     /// <summary>
     /// Delete a vote from its id
     /// </summary>

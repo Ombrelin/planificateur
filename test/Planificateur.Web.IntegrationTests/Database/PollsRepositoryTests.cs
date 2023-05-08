@@ -39,7 +39,7 @@ public class PollsRepositoryTests
         pollInDb.ExpirationDate.Should().Be(poll.ExpirationDate);
         pollInDb.Name.Should().Be(poll.Name);
     }
-    
+
     [Fact]
     public async Task Insert_WithVotes_InsertsPollInDb()
     {
@@ -70,7 +70,7 @@ public class PollsRepositoryTests
         voteInDb.VoterName.Should().Be(vote.VoterName);
     }
 
-    
+
     [Fact]
     public async Task Get_ExistingPollWithVotes_ReturnsPoll()
     {
@@ -101,7 +101,7 @@ public class PollsRepositoryTests
         resultVote.Id.Should().Be(vote.Id);
         resultVote.VoterName.Should().Be(vote.VoterName);
     }
-    
+
     [Fact]
     public async Task Get_ExistingPoll_ReturnsPoll()
     {
@@ -126,7 +126,7 @@ public class PollsRepositoryTests
         result.ExpirationDate.Should().Be(poll.ExpirationDate);
         result.Name.Should().Be(poll.Name);
     }
-    
+
     [Fact]
     public async Task Get_NonExistingPoll_ReturnsNull()
     {

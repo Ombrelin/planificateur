@@ -3,7 +3,7 @@ using Planificateur.Core.Repositories;
 
 namespace Planificateur.Web.Database;
 
-public class InMemoryDatabase : IPollsRepository,IVotesRepository
+public class InMemoryDatabase : IPollsRepository, IVotesRepository
 {
     public readonly IDictionary<Guid, Poll> Data = new Dictionary<Guid, Poll>();
 
@@ -14,7 +14,7 @@ public class InMemoryDatabase : IPollsRepository,IVotesRepository
     }
 
     public Task<Poll?> Get(Guid id) => Task.FromResult(Data.ContainsKey(id) ? Data[id] : null);
-    
+
     private Task<Vote> Insert(Vote vote)
     {
         Data[vote.PollId].Votes.Add(vote);

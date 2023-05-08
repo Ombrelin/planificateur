@@ -4,7 +4,9 @@ public class Poll
 {
     public Guid Id { get; }
     private string name;
-    public string Name    {
+
+    public string Name
+    {
         get => name;
         set => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
     }
@@ -31,7 +33,6 @@ public class Poll
 
     public Poll(string name, List<DateTime> dates) : this(Guid.NewGuid(), name, dates)
     {
-        
     }
 
     public (IReadOnlyCollection<DateTime> dates, decimal? score) BestDates
@@ -42,7 +43,7 @@ public class Poll
             {
                 return (new List<DateTime>(), null);
             }
-            
+
             var scoredDates = ScoreDates();
             decimal bestScore = GetBestScore(scoredDates);
 
@@ -52,7 +53,8 @@ public class Poll
         }
     }
 
-    private static DateTime[] ExtractBestDates(IEnumerable<(DateTime date, decimal score)> scoredDates, decimal bestScore)
+    private static DateTime[] ExtractBestDates(IEnumerable<(DateTime date, decimal score)> scoredDates,
+        decimal bestScore)
     {
         return scoredDates
             .Where(scoreDate => scoreDate.score == bestScore)
@@ -68,7 +70,9 @@ public class Poll
     {
         var scoredDates = Dates
             .Select((date, index) =>
-                (date, score: Votes.Select(vote => vote.Availabilities[index]).Select(availability => (decimal)availability).Sum() / 2))
+                (date,
+                    score: Votes.Select(vote => vote.Availabilities[index])
+                        .Select(availability => (decimal)availability).Sum() / 2))
             .ToList();
         return scoredDates;
     }

@@ -1,4 +1,3 @@
-
 using Planificateur.Web;
 
 Host.CreateDefaultBuilder(args)

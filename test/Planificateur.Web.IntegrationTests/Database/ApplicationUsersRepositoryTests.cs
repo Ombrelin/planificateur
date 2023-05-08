@@ -12,7 +12,7 @@ public class ApplicationUsersRepositoryTests
     private readonly ApplicationUsersRepository repository;
     private readonly ApplicationDbContext dbContext;
     private readonly DataFactory dataFactory = new();
-    
+
     public ApplicationUsersRepositoryTests(DatabaseFixture database)
     {
         dbContext = database.DbContext;
@@ -24,10 +24,10 @@ public class ApplicationUsersRepositoryTests
     {
         // Given
         ApplicationUser user = dataFactory.BuildTestUser();
-        
+
         // When
         await repository.Insert(user);
-        
+
         // Then
         ApplicationUser userInDb = await dbContext.Users.FirstAsync(record => record.Id == user.Id);
         userInDb.Username.Should().Be(userInDb.Username);
@@ -41,17 +41,17 @@ public class ApplicationUsersRepositoryTests
         ApplicationUser user = dataFactory.BuildTestUser();
         await dbContext.Users.AddAsync(user);
         await dbContext.SaveChangesAsync();
-        
+
         // When
         ApplicationUser? result = await repository.FindByUsername(user.Username);
-        
+
         // Then
         Assert.NotNull(result);
         result.Id.Should().Be(user.Id);
         result.Username.Should().Be(user.Username);
         result.Password.Should().NotBeEmpty();
     }
-    
+
     [Fact]
     public async Task FindByUsername_NonExistingUser_ReturnsNull()
     {
@@ -59,10 +59,10 @@ public class ApplicationUsersRepositoryTests
         ApplicationUser user = dataFactory.BuildTestUser();
         await dbContext.Users.AddAsync(user);
         await dbContext.SaveChangesAsync();
-        
+
         // When
         ApplicationUser? result = await repository.FindByUsername("non existing username");
-        
+
         // Then
         Assert.Null(result);
     }

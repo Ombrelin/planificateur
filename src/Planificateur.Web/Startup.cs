@@ -26,10 +26,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services
-            .AddControllers(options =>
-            {
-                options.Filters.Add(typeof(ExceptionMiddleware));
-            })
+            .AddControllers(options => { options.Filters.Add(typeof(ExceptionMiddleware)); })
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());

@@ -12,7 +12,7 @@ public class VotesTests
     {
         // When
         var act = () => new Vote(Guid.NewGuid(), invalidVoterName);
-        
+
         // Then
         act.Should().Throw<ArgumentException>();
     }
