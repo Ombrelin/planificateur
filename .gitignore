@@ -7,3 +7,5 @@ riderModule.iml
 **.sln.DotSettings.user
 .fleet
 **.js
+src/Planificateur.Web/logs
+src/Planificateur.Web/wwwroot/script.js.map
