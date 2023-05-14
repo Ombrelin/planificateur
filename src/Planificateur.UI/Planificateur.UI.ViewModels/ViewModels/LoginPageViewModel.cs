@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Planificateur.ClientSdk.Models;
+using Planificateur.UI.ViewModels.Services;
 
 namespace Planificateur.UI.ViewModels.ViewModels;
 
@@ -18,8 +20,19 @@ public partial class LoginPageViewModel
     
     public bool CanLogin => !(string.IsNullOrEmpty(this.Username) || string.IsNullOrEmpty(this.Password));
 
+    private readonly IPlanificateurApi apiClient;
+    private readonly INavigationService navigationService;
+
+    public LoginPageViewModel(IPlanificateurApi apiClient, INavigationService navigationService)
+    {
+        this.apiClient = apiClient;
+        this.navigationService = navigationService;
+    }
+
     [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanLogin))]
     private async Task Login()
     {
+        await apiClient.Login(ServerUrl, new LoginRequest {Username = Username, Password = Password});
+        await navigationService.NavigateToAsync("home");
     }
 }

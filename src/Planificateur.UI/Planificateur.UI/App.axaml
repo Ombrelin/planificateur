@@ -6,9 +6,12 @@
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Styles>
-        <Style Selector="Button,TextBox, Label, ComboBox">
+        <Style Selector="Button,TextBox, Label.FieldLabel, ComboBox">
             <Setter Property="Width" Value="200" />
             <Setter Property="Height" Value="32" />
+        </Style>
+        <Style Selector="Label.FieldLabel">
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
         </Style>
         <FluentTheme />
         <styling:FluentAvaloniaTheme />

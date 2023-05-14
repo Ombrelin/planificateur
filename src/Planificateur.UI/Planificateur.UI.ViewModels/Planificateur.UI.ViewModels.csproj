@@ -11,4 +11,8 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Planificateur.ClientSdk\Planificateur.ClientSdk.csproj" />
+    </ItemGroup>
+
 </Project>

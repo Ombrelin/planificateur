@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.UI.ViewModels
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.UI.Tests", "test\Planificateur.UI.Tests\Planificateur.UI.Tests.csproj", "{FE31C595-0BD5-4139-A2B3-45A3A847EB52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.ClientSdk", "src\Planificateur.ClientSdk\Planificateur.ClientSdk.csproj", "{0078D76F-C261-413C-90AD-653F2007BA0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,5 +100,9 @@ Global
 		{FE31C595-0BD5-4139-A2B3-45A3A847EB52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE31C595-0BD5-4139-A2B3-45A3A847EB52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE31C595-0BD5-4139-A2B3-45A3A847EB52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0078D76F-C261-413C-90AD-653F2007BA0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0078D76F-C261-413C-90AD-653F2007BA0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0078D76F-C261-413C-90AD-653F2007BA0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0078D76F-C261-413C-90AD-653F2007BA0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

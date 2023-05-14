@@ -7,6 +7,10 @@ using Avalonia.Threading;
 using FluentAvalonia.Styling;
 using FluentAvalonia.UI.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Authentication;
+using Microsoft.Kiota.Http.HttpClientLibrary;
+using Planificateur.ClientSdk;
 using Planificateur.UI.Services;
 using Planificateur.UI.ViewModels.Services;
 using Planificateur.UI.ViewModels.ViewModels;
@@ -17,6 +21,7 @@ namespace Planificateur.UI;
 public partial class App : Application
 {
     private readonly IServiceCollection services = new ServiceCollection()
+        .AddSingleton<HomePageViewModel>()
         .AddSingleton<LoginPageViewModel>();
 
     private ServiceProvider? serviceProvider;
@@ -44,15 +49,26 @@ public partial class App : Application
             services.AddSingleton<IStorageService, MobileStorageService>();
         }
 
+        ConfigureApiClient();
+        
         var navigationService = new NavigationService(navigationFrame);
         ConfigureNavigation(navigationService);
 
         base.OnFrameworkInitializationCompleted();
     }
 
+    private void ConfigureApiClient()
+    {
+        this.services.AddSingleton<IAccessTokenProvider, TokenProvider>();
+        this.services.AddSingleton<IAuthenticationProvider, BaseBearerTokenAuthenticationProvider>();
+        this.services.AddSingleton<IRequestAdapter, HttpClientRequestAdapter>();
+        this.services.AddSingleton<IPlanificateurApi, PlanificateurApi>();
+    }
+
     private void ConfigureNavigation(NavigationService navigationService)
     {
         navigationService.RegisterPage("login", typeof(LoginPage));
+        navigationService.RegisterPage("home", typeof(HomePage));
         services.AddSingleton<INavigationService>(navigationService);
         serviceProvider = services.BuildServiceProvider();
         this.Resources[typeof(IServiceProvider)] = serviceProvider;
