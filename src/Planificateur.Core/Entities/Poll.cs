@@ -11,8 +11,8 @@ public class Poll
         set => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
     }
 
-    public DateTime ExpirationDate { get; set; }
-    public IList<Vote> Votes { get; set; }
+
+    public List<Vote> Votes { get; set; }
 
     private List<DateTime> dates = new List<DateTime>();
 
@@ -21,18 +21,16 @@ public class Poll
         get => dates;
         set => dates = value.Count is 0 ? throw new ArgumentException("Poll dates can't be empty") : value;
     }
-
-    public Poll(Guid id, string name, List<DateTime> dates)
+    
+    public DateTime ExpirationDate { get; set; }
+    
+    public Poll(string name, List<DateTime> dates)
     {
+        Id = Guid.NewGuid();
         Name = name;
-        Id = id;
+        Dates = dates;
         ExpirationDate = DateTime.UtcNow.AddMonths(2);
         Votes = new List<Vote>();
-        Dates = dates;
-    }
-
-    public Poll(string name, List<DateTime> dates) : this(Guid.NewGuid(), name, dates)
-    {
     }
 
     public (IReadOnlyCollection<DateTime> dates, decimal? score) BestDates

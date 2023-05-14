@@ -21,7 +21,7 @@
 
             <form action="/polls/@Model.Id/votes" method="post">
 
-                <table class="table">
+                <table class="table is-striped">
                     <thead>
                     <tr>
                         <th></th>
@@ -46,7 +46,7 @@
                         <tr class="date-row">
                             <td class="date-cell" data-year="@date.Year" data-month="@date.Month" data-day="@date.Day" data-hour="@date.Hour" data-minute="@date.Minute"></td>
                             <td>
-                                <div class="control">
+                                <div class="control available-radio-button">
                                     <label class="radio">
                                         <input type="radio" required name="availability[@index]" value="Available"/>
                                         <span class="ignore-dark-theme">✅</span> <span class="vote-legend">Available</span>
@@ -132,7 +132,7 @@
 
                     @foreach (DateTime date in @bestDates.dates)
                     {
-                        <li>@date.ToString("dddd dd/MM/yy")</li>
+                        <li class="best-date" data-year="@date.Year" data-month="@date.Month" data-day="@date.Day" data-hour="@date.Hour" data-minute="@date.Minute">@date.ToString("dddd dd/MM/yy")</li>
                     }
                 </ul>
             </div>

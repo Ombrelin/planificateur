@@ -79,7 +79,7 @@ const deleteVote = async (pollId: string, voteId: string) => {
     location.reload();
 }
 
-const fillLocalizedDate = (td: HTMLElement) => {
+const getLocalizedDate = (td: HTMLElement) : {formattedDate: string, formattedTime: string} => {
     const utcDate = new Date(
         Date.UTC(
             Number.parseInt(td.dataset.year ?? "0"), 
@@ -102,16 +102,34 @@ const fillLocalizedDate = (td: HTMLElement) => {
         hourCycle: "h24"
     };
     
-    td.innerHTML = `
-        ${Intl.DateTimeFormat(Intl.DateTimeFormat().resolvedOptions().locale, dateOptions).format(utcDate)}
-        <br>
-        ${Intl.DateTimeFormat(Intl.DateTimeFormat().resolvedOptions().locale, timeOptions).format(utcDate)}
-    `;
+    return {
+        formattedDate: Intl.DateTimeFormat(Intl.DateTimeFormat().resolvedOptions().locale, dateOptions).format(utcDate),
+        formattedTime: Intl.DateTimeFormat(Intl.DateTimeFormat().resolvedOptions().locale, timeOptions).format(utcDate) 
+    }
 }
+
+const fillDateCell = (td: Element) => {
+    const {formattedDate, formattedTime} = getLocalizedDate(td as HTMLElement);
+    td.innerHTML = `
+            ${formattedDate}
+            <br>
+            ${formattedTime}
+        `;
+}
+
+const fillBestDate = (li: Element) => {
+    const {formattedDate, formattedTime} = getLocalizedDate(li as HTMLElement);
+    li.innerHTML = `${formattedDate} ${formattedTime}`
+};
 
 const loadLocalDates = () => {
     const tds = document.querySelectorAll(".date-cell");
     for(const td of tds){
-        fillLocalizedDate(td as HTMLElement);
+        fillDateCell(td);
+    }
+
+    const lis = document.querySelectorAll(".best-date");
+    for(const li of lis){
+        fillBestDate(li);
     }
 }

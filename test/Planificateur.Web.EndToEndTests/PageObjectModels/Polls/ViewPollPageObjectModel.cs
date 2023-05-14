@@ -86,7 +86,7 @@ public class ViewPollPageObjectModel : PageObjectModel
         foreach ((IElementHandle listElement, int index) in bestDates)
         {
             var text = await listElement.TextContentAsync();
-            text.Should().Be(dateTimes[index].ToString("dddd dd/MM/yy"));
+            text.Should().Be(dateTimes[index].ToString("dddd, MM/dd/yyyy hh:mm"));
         }
     }
 
