@@ -9,6 +9,7 @@ using Npgsql;
 using Planificateur.Core;
 using Planificateur.Core.Repositories;
 using Planificateur.Web.Database;
+using Planificateur.Web.Database.Repositories;
 using Planificateur.Web.Json;
 using Planificateur.Web.Middlewares;
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
+using Planificateur.Web.Database.Entities;
 using Planificateur.Web.Tests.Database;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
@@ -41,7 +42,7 @@ public class PollsTests : ApiIntegrationTests
         pollFromResponse.RootElement.GetProperty("expirationDate").GetDateTime().Should()
             .BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
 
-        Poll pollInDb = await DbContext.Polls.FirstAsync(record => record.Id.ToString() == id);
+        PollEntity pollInDb = await DbContext.Polls.FirstAsync(record => record.Id.ToString() == id);
         pollInDb.Name.Should().Be(createPollRequest.Name);
         pollInDb.ExpirationDate.Should().BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
         pollInDb.Dates.Should().HaveCount(createPollRequest.Dates.Count);
@@ -58,7 +59,7 @@ public class PollsTests : ApiIntegrationTests
             "Test Poll",
             new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
         );
-        await DbContext.Polls.AddAsync(poll);
+        await DbContext.Polls.AddAsync(new PollEntity(poll));
         await DbContext.SaveChangesAsync();
 
         // When
@@ -109,7 +110,7 @@ public class PollsTests : ApiIntegrationTests
         var vote = new Vote(poll.Id, "Test Voter");
         poll.Votes.Add(vote);
 
-        await DbContext.Polls.AddAsync(poll);
+        await DbContext.Polls.AddAsync(new PollEntity(poll));
         await DbContext.SaveChangesAsync();
 
         // When
@@ -129,7 +130,7 @@ public class PollsTests : ApiIntegrationTests
             "Test Poll",
             new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
         );
-        await DbContext.Polls.AddAsync(poll);
+        await DbContext.Polls.AddAsync(new PollEntity(poll));
         await DbContext.SaveChangesAsync();
 
         var voteRequest =
@@ -143,6 +144,7 @@ public class PollsTests : ApiIntegrationTests
         using JsonDocument voteFromResponse = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
 
         string? voteId = voteFromResponse.RootElement.GetProperty("id").GetString();
+        Assert.NotNull(voteId);
         voteId.Should().NotBeEmpty();
         voteFromResponse.RootElement.GetProperty("voterName").GetString().Should().Be(voteRequest.VoterName);
         voteFromResponse.RootElement.GetProperty("pollId").GetString().Should().Be(poll.Id.ToString());
@@ -158,7 +160,7 @@ public class PollsTests : ApiIntegrationTests
         availabilities[0].Should().Be(Availability.Available.ToString());
         availabilities[1].Should().Be(Availability.NotAvailable.ToString());
 
-        var voteFromDb = await DbContext.Votes.FirstAsync(voteRecord => voteRecord.Id == Guid.Parse(voteId));
+        VoteEntity voteFromDb = await DbContext.Votes.FirstAsync(voteRecord => voteRecord.Id == Guid.Parse(voteId));
         voteFromDb.Id.Should().Be(voteId);
         voteFromDb.VoterName.Should().Be(voteRequest.VoterName);
         voteFromDb.Availabilities.Should().BeEquivalentTo(new[] { Availability.Available, Availability.NotAvailable });

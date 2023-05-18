@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
 using Planificateur.Core.Repositories;
+using Planificateur.Web.Database.Entities;
 
-namespace Planificateur.Web.Database;
+namespace Planificateur.Web.Database.Repositories;
 
 public class PollsRepository : IPollsRepository
 {
@@ -15,16 +16,19 @@ public class PollsRepository : IPollsRepository
 
     public async Task<Poll> Insert(Poll poll)
     {
-        await dbContext.Polls.AddAsync(poll);
+        var entity = new PollEntity(poll);
+        await dbContext.Polls.AddAsync(entity);
         await dbContext.SaveChangesAsync();
         return poll;
     }
 
     public async Task<Poll?> Get(Guid id)
     {
-        return await dbContext
+        PollEntity? entity = await dbContext
             .Polls
             .Include(poll => poll.Votes)
             .FirstOrDefaultAsync(poll => poll.Id == id);
+
+        return entity?.ToDomainObject();
     }
 }

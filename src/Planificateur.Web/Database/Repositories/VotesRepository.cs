@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
 using Planificateur.Core.Repositories;
+using Planificateur.Web.Database.Entities;
 
-namespace Planificateur.Web.Database;
+namespace Planificateur.Web.Database.Repositories;
 
 public class VotesRepository : IVotesRepository
 {
@@ -15,7 +16,7 @@ public class VotesRepository : IVotesRepository
 
     public async Task Delete(Guid id)
     {
-        Vote? vote = await FindById(id);
+        VoteEntity? vote = await FindById(id);
 
         if (vote is not null)
         {
@@ -23,27 +24,27 @@ public class VotesRepository : IVotesRepository
             await dbContext.SaveChangesAsync();
         }
     }
-
-    private async Task<Vote?> FindById(Guid id)
-    {
-        Vote? vote = await dbContext.Votes
-            .FirstOrDefaultAsync(record => record.Id == id);
-        return vote;
-    }
-
     public async Task Save(Vote vote)
     {
-        Vote? existingVote = await FindById(vote.Id);
-
-        if (existingVote is null)
+        VoteEntity? entity = await FindById(vote.Id);
+        
+        if (entity is null)
         {
-            await dbContext.Votes.AddAsync(vote);
+            await dbContext.Votes.AddAsync(new VoteEntity(vote));
         }
         else
         {
-            existingVote.Availabilities = vote.Availabilities;
+            entity.Availabilities = vote.Availabilities.ToArray();
         }
 
         await dbContext.SaveChangesAsync();
+    }
+
+    private async Task<VoteEntity?> FindById(Guid id)
+    {
+        VoteEntity? entity = await dbContext
+            .Votes
+            .FirstOrDefaultAsync(record => record.Id == id);
+        return entity;
     }
 }

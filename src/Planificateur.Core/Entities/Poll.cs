@@ -8,13 +8,13 @@ public class Poll
     public string Name
     {
         get => name;
-        set => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
+        private set => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
     }
 
 
     public List<Vote> Votes { get; set; }
 
-    private List<DateTime> dates = new List<DateTime>();
+    private List<DateTime> dates = new();
 
     public List<DateTime> Dates
     {
@@ -24,13 +24,17 @@ public class Poll
     
     public DateTime ExpirationDate { get; set; }
     
-    public Poll(string name, List<DateTime> dates)
+    public Poll(string name, List<DateTime> dates) : this(Guid.NewGuid(), name, dates, DateTime.UtcNow.AddMonths(2), Array.Empty<Vote>())
     {
-        Id = Guid.NewGuid();
+    }
+
+    public Poll(Guid id, string name, IEnumerable<DateTime> dates, DateTime expirationDate, IEnumerable<Vote> votes)
+    {
+        Id = id;
         Name = name;
-        Dates = dates;
-        ExpirationDate = DateTime.UtcNow.AddMonths(2);
-        Votes = new List<Vote>();
+        Dates = dates.ToList();
+        ExpirationDate = expirationDate;
+        Votes = votes.ToList();
     }
 
     public (IReadOnlyCollection<DateTime> dates, decimal? score) BestDates

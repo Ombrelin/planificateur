@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
+using Planificateur.Web.Database.Entities;
 using Planificateur.Web.Tests.Database;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
@@ -37,7 +38,7 @@ public class AuthenticationTests : ApiIntegrationTests
         payload.Username.Should().Be(request.Username);
         payload.Id.Should().NotBeEmpty();
 
-        ApplicationUser userInDb = await DbContext.Users.FirstAsync(u => u.Id == payload.Id);
+        ApplicationUserEntity userInDb = await DbContext.Users.FirstAsync(u => u.Id == payload.Id);
         userInDb.Username.Should().Be(request.Username);
         userInDb.Password.Should().NotBeEmpty();
     }
@@ -79,7 +80,7 @@ public class AuthenticationTests : ApiIntegrationTests
     private async Task<ApplicationUser> InsertTestApplicationUser()
     {
         ApplicationUser user = DataFactory.BuildTestUser();
-        await DbContext.Users.AddAsync(user);
+        await DbContext.Users.AddAsync(new ApplicationUserEntity(user));
         await DbContext.SaveChangesAsync();
         return user;
     }

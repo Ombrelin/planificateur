@@ -2,6 +2,8 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Database;
+using Planificateur.Web.Database.Entities;
+using Planificateur.Web.Database.Repositories;
 
 namespace Planificateur.Web.Tests.Database;
 
@@ -34,7 +36,7 @@ public class PollsRepositoryTests
         await repository.Insert(poll);
 
         // Then
-        Poll pollInDb = await this.dbContext.Polls.FirstAsync(element => element.Id == poll.Id);
+        PollEntity pollInDb = await this.dbContext.Polls.FirstAsync(element => element.Id == poll.Id);
         pollInDb.Dates.Should().BeEquivalentTo(poll.Dates);
         pollInDb.ExpirationDate.Should().Be(poll.ExpirationDate);
         pollInDb.Name.Should().Be(poll.Name);
@@ -59,13 +61,13 @@ public class PollsRepositoryTests
         await repository.Insert(poll);
 
         // Then
-        Poll pollInDb = await this.dbContext
+        PollEntity pollInDb = await this.dbContext
             .Polls
             .FirstAsync(element => element.Id == poll.Id);
         pollInDb.Dates.Should().BeEquivalentTo(poll.Dates);
         pollInDb.ExpirationDate.Should().Be(poll.ExpirationDate);
         pollInDb.Name.Should().Be(poll.Name);
-        Vote voteInDb = Assert.Single(pollInDb.Votes);
+        VoteEntity voteInDb = Assert.Single(pollInDb.Votes);
         voteInDb.Id.Should().Be(vote.Id);
         voteInDb.VoterName.Should().Be(vote.VoterName);
     }
@@ -86,7 +88,7 @@ public class PollsRepositoryTests
         var vote = new Vote(poll.Id, "Test Voter Name");
         poll.Votes = new List<Vote> { vote };
 
-        await dbContext.AddAsync(poll);
+        await dbContext.Polls.AddAsync(new PollEntity(poll));
         await dbContext.SaveChangesAsync();
 
         // When
@@ -94,7 +96,7 @@ public class PollsRepositoryTests
 
         // Then
         result.Should().NotBeNull();
-        result.Dates.Should().BeEquivalentTo(poll.Dates);
+        result!.Dates.Should().BeEquivalentTo(poll.Dates);
         result.ExpirationDate.Should().Be(poll.ExpirationDate);
         result.Name.Should().Be(poll.Name);
         Vote resultVote = Assert.Single(result.Votes);
@@ -114,7 +116,7 @@ public class PollsRepositoryTests
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)
         };
-        await dbContext.AddAsync(poll);
+        await dbContext.Polls.AddAsync(new PollEntity(poll));
         await dbContext.SaveChangesAsync();
 
         // When
@@ -122,7 +124,7 @@ public class PollsRepositoryTests
 
         // Then
         result.Should().NotBeNull();
-        result.Dates.Should().BeEquivalentTo(poll.Dates);
+        result!.Dates.Should().BeEquivalentTo(poll.Dates);
         result.ExpirationDate.Should().Be(poll.ExpirationDate);
         result.Name.Should().Be(poll.Name);
     }

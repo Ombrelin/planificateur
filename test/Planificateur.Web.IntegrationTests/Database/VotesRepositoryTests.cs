@@ -2,6 +2,8 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Database;
+using Planificateur.Web.Database.Entities;
+using Planificateur.Web.Database.Repositories;
 
 namespace Planificateur.Web.Tests.Database;
 
@@ -32,16 +34,17 @@ public class VotesRepositoryTests
         var vote = new Vote(poll.Id, "Test Voter Name");
         poll.Votes = new List<Vote> { vote };
 
-        await dbContext.AddAsync(poll);
+        await dbContext.AddAsync(new PollEntity(poll));
         await dbContext.SaveChangesAsync();
 
         // When
         await repository.Delete(vote.Id);
 
         // Then
-        Vote? voteInDb = await dbContext.Votes.FirstOrDefaultAsync(record => record.Id == vote.Id);
+        VoteEntity? voteInDb = await dbContext.Votes.FirstOrDefaultAsync(record => record.Id == vote.Id);
         voteInDb.Should().BeNull();
-        Poll? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
+        PollEntity? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
+        Assert.NotNull(pollInDb);
         pollInDb.Votes.Should().BeEmpty();
     }
 
@@ -67,7 +70,7 @@ public class VotesRepositoryTests
             ExpirationDate = DateTime.UtcNow.AddDays(10)
         };
 
-        await dbContext.AddAsync(poll);
+        await dbContext.Polls.AddAsync(new PollEntity(poll));
         await dbContext.SaveChangesAsync();
 
         var vote = new Vote(poll.Id, "Test Voter Name");
@@ -76,8 +79,9 @@ public class VotesRepositoryTests
         await repository.Save(vote);
 
         // Then
-        Poll? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
-        Vote voteInDb = Assert.Single(pollInDb.Votes);
+        PollEntity? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
+        Assert.NotNull(pollInDb);
+        VoteEntity voteInDb = Assert.Single(pollInDb.Votes);
         voteInDb.Id.Should().Be(vote.Id);
         voteInDb.VoterName.Should().Be("Test Voter Name");
         voteInDb.PollId.Should().Be(poll.Id);
@@ -99,27 +103,27 @@ public class VotesRepositoryTests
 
         poll.Votes = new List<Vote> { vote };
 
-        await dbContext.AddAsync(poll);
+        await dbContext.Polls.AddAsync(new PollEntity(poll));
         await dbContext.SaveChangesAsync();
 
         var updatedVotes = new Vote
         (
-            vote.Id, poll.Id, "Test Voter Name"
-        )
-        {
-            Availabilities =
-                new List<Availability>
-                {
-                    Availability.NotAvailable
-                }
-        };
+            vote.Id,
+            poll.Id,
+            "Test Voter Name",
+            new List<Availability>
+            {
+                Availability.NotAvailable
+            }
+        );
 
         // When
         await repository.Save(updatedVotes);
 
         // Then
-        Poll? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
-        Vote voteInDb = Assert.Single(pollInDb.Votes);
+        PollEntity? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
+        Assert.NotNull(pollInDb);
+        VoteEntity voteInDb = Assert.Single(pollInDb.Votes);
         voteInDb.Id.Should().Be(vote.Id);
         voteInDb.VoterName.Should().Be("Test Voter Name");
         voteInDb.PollId.Should().Be(poll.Id);

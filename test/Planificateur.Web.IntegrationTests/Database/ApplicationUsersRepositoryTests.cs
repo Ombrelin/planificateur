@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
 using Planificateur.Tests.Shared;
 using Planificateur.Web.Database;
+using Planificateur.Web.Database.Entities;
+using Planificateur.Web.Database.Repositories;
 
 namespace Planificateur.Web.Tests.Database;
 
@@ -12,7 +14,7 @@ public class ApplicationUsersRepositoryTests
     private readonly ApplicationUsersRepository repository;
     private readonly ApplicationDbContext dbContext;
     private readonly DataFactory dataFactory = new();
-
+    
     public ApplicationUsersRepositoryTests(DatabaseFixture database)
     {
         dbContext = database.DbContext;
@@ -29,7 +31,7 @@ public class ApplicationUsersRepositoryTests
         await repository.Insert(user);
 
         // Then
-        ApplicationUser userInDb = await dbContext.Users.FirstAsync(record => record.Id == user.Id);
+        ApplicationUserEntity userInDb = await dbContext.Users.FirstAsync(record => record.Id == user.Id);
         userInDb.Username.Should().Be(userInDb.Username);
         userInDb.Password.Should().NotBeEmpty();
     }
@@ -39,7 +41,7 @@ public class ApplicationUsersRepositoryTests
     {
         // Given
         ApplicationUser user = dataFactory.BuildTestUser();
-        await dbContext.Users.AddAsync(user);
+        await dbContext.Users.AddAsync(new ApplicationUserEntity(user));
         await dbContext.SaveChangesAsync();
 
         // When
@@ -57,7 +59,7 @@ public class ApplicationUsersRepositoryTests
     {
         // Given
         ApplicationUser user = dataFactory.BuildTestUser();
-        await dbContext.Users.AddAsync(user);
+        await dbContext.Users.AddAsync(new ApplicationUserEntity(user));
         await dbContext.SaveChangesAsync();
 
         // When
