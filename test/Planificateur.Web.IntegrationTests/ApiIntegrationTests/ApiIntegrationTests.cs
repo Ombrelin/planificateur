@@ -1,4 +1,7 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Planificateur.Core.Contracts;
 using Planificateur.Tests.Shared;
 using Planificateur.Web.Database;
 using Planificateur.Web.Tests.Database;
@@ -15,5 +18,32 @@ public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
     {
         Client = webApplicationFactory.CreateClient();
         DbContext = databaseFixture.DbContext;
+    }
+
+    public async Task<RegisterResponse> RegisterNewUser()
+    {
+        var request = new RegisterRequest(
+            DataFactory.Username,
+            DataFactory.Password
+        );
+        HttpResponseMessage response = await Client.PostAsJsonAsync("/api/authentication/register", request);
+
+        return (await response.Content.ReadFromJsonAsync<RegisterResponse>())!;
+    }
+
+    public async Task<LoginResponse> Login()
+    {
+        HttpResponseMessage response = await Client.PostAsJsonAsync(
+            "/api/authentication/login",
+            new LoginRequest(
+                DataFactory.Username,
+                DataFactory.Password
+            )
+        );
+        var loginResponse = (await response.Content.ReadFromJsonAsync<LoginResponse>())!;
+
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.Token);
+
+        return loginResponse;
     }
 }
