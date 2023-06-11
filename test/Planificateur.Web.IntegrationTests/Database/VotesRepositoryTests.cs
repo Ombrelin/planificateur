@@ -26,7 +26,7 @@ public class VotesRepositoryTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new [] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)
@@ -64,7 +64,7 @@ public class VotesRepositoryTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new [] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)
@@ -94,7 +94,7 @@ public class VotesRepositoryTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new [] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)

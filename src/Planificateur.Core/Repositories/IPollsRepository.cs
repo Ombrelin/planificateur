@@ -6,4 +6,5 @@ public interface IPollsRepository
 {
     Task<Poll> Insert(Poll poll);
     Task<Poll?> Get(Guid id);
+    Task<IEnumerable<Poll>> GetPollsByAuthorId(Guid currentUserId);
 }

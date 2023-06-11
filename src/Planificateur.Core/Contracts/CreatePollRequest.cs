@@ -5,7 +5,7 @@ namespace Planificateur.Core.Contracts;
 public record CreatePollRequest(
     [Required] string Name,
     DateTime ExpirationDate,
-    [Required] List<DateTime> Dates
+    [Required] DateTime[] Dates
 )
 {
     /// <summary>
@@ -24,5 +24,5 @@ public record CreatePollRequest(
     /// <summary>
     /// Date choices available in the Poll.
     /// </summary>
-    public List<DateTime> Dates { get; init; } = Dates;
+    public DateTime[] Dates { get; init; } = Dates;
 }

@@ -1,6 +1,10 @@
+using System;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +12,7 @@ using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Database.Entities;
 using Planificateur.Web.Tests.Database;
+using Xunit;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
@@ -25,7 +30,7 @@ public class PollsTests : ApiIntegrationTests
         // Given
         var createPollRequest = new CreatePollRequest
         ("Test Poll", DateTime.UtcNow.AddDays(90),
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) });
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) });
 
         // When
         HttpResponseMessage response = await Client.PostAsJsonAsync("/api/polls", createPollRequest);
@@ -45,9 +50,46 @@ public class PollsTests : ApiIntegrationTests
         PollEntity pollInDb = await DbContext.Polls.FirstAsync(record => record.Id.ToString() == id);
         pollInDb.Name.Should().Be(createPollRequest.Name);
         pollInDb.ExpirationDate.Should().BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
-        pollInDb.Dates.Should().HaveCount(createPollRequest.Dates.Count);
+        pollInDb.Dates.Should().HaveCount(createPollRequest.Dates.Length);
         pollInDb.Dates[0].Should().BeCloseTo(createPollRequest.Dates[0], TimeSpan.FromMilliseconds(50));
         pollInDb.Dates[1].Should().BeCloseTo(createPollRequest.Dates[1], TimeSpan.FromMilliseconds(50));
+    }
+
+    [Fact]
+    public async Task CreatePoll_WhenLoggedIn_CreatesPollInDbWithAuthor()
+    {
+        // Given
+        var createPollRequest = new CreatePollRequest
+        ("Test Poll", DateTime.UtcNow.AddDays(90),
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) });
+
+        string userId = (await RegisterNewUser()).Id.ToString();
+        await Login();
+
+        // When
+        HttpResponseMessage response = await Client.PostAsJsonAsync("/api/polls", createPollRequest);
+
+        // Then
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        using JsonDocument pollFromResponse = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        string? id = pollFromResponse.RootElement.GetProperty("id").GetString();
+        id.Should().NotBeEmpty();
+        pollFromResponse.RootElement.GetProperty("name").GetString().Should().Be(createPollRequest.Name);
+        pollFromResponse.RootElement.GetProperty("dates").EnumerateArray().AsEnumerable()
+            .Select(date => date.GetDateTime()).Should().BeEquivalentTo(createPollRequest.Dates);
+        pollFromResponse.RootElement.GetProperty("expirationDate").GetDateTime().Should()
+            .BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
+        pollFromResponse.RootElement.GetProperty("authorId").GetString().Should()
+            .Be(userId);
+
+        PollEntity pollInDb = await DbContext.Polls.FirstAsync(record => record.Id.ToString() == id);
+        pollInDb.Name.Should().Be(createPollRequest.Name);
+        pollInDb.ExpirationDate.Should().BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
+        pollInDb.Dates.Should().HaveCount(createPollRequest.Dates.Length);
+        pollInDb.Dates[0].Should().BeCloseTo(createPollRequest.Dates[0], TimeSpan.FromMilliseconds(50));
+        pollInDb.Dates[1].Should().BeCloseTo(createPollRequest.Dates[1], TimeSpan.FromMilliseconds(50));
+        pollInDb.AuthorId.Should().Be(userId);
     }
 
     [Fact]
@@ -57,7 +99,7 @@ public class PollsTests : ApiIntegrationTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
         );
         await DbContext.Polls.AddAsync(new PollEntity(poll));
         await DbContext.SaveChangesAsync();
@@ -105,7 +147,7 @@ public class PollsTests : ApiIntegrationTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
         );
         var vote = new Vote(poll.Id, "Test Voter");
         poll.Votes.Add(vote);
@@ -128,7 +170,7 @@ public class PollsTests : ApiIntegrationTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
         );
         await DbContext.Polls.AddAsync(new PollEntity(poll));
         await DbContext.SaveChangesAsync();

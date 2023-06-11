@@ -8,11 +8,13 @@ public class PollApplication
 {
     private readonly IPollsRepository pollsRepository;
     private readonly IVotesRepository votesRepository;
+    private readonly Guid? currentUserId;
 
-    public PollApplication(IPollsRepository pollsRepository, IVotesRepository votesRepository)
+    public PollApplication(IPollsRepository pollsRepository, IVotesRepository votesRepository, Guid? currentUserId = null)
     {
         this.pollsRepository = pollsRepository;
         this.votesRepository = votesRepository;
+        this.currentUserId = currentUserId;
     }
 
     public async Task<Poll> CreatePoll(CreatePollRequest createPollRequest)
@@ -22,7 +24,8 @@ public class PollApplication
             createPollRequest.Dates
         )
         {
-            ExpirationDate = createPollRequest.ExpirationDate
+            ExpirationDate = createPollRequest.ExpirationDate,
+            AuthorId = currentUserId
         };
         await this.pollsRepository.Insert(poll);
         return poll;
@@ -47,5 +50,14 @@ public class PollApplication
     public async Task RemoveVote(Guid voteId)
     {
         await this.votesRepository.Delete(voteId);
+    }
+
+    public async Task<IEnumerable<Poll>> GetCurrentUserPolls()
+    {
+        if (this.currentUserId is null)
+        {
+            throw new ArgumentNullException();
+        }
+        return await this.pollsRepository.GetPollsByAuthorId(this.currentUserId.Value);
     }
 }

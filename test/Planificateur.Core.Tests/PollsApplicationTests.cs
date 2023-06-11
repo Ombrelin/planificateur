@@ -7,46 +7,72 @@ namespace Planificateur.Core.Tests;
 
 public class PollsApplicationTests
 {
+    private readonly FakePollsRepository fakePollsRepository = new();
+    private readonly FakeVotesRepository fakeVotesRepository = new();
+
+    private readonly PollApplication pollApplication;
+
+    public PollsApplicationTests()
+    {
+        pollApplication = new PollApplication(fakePollsRepository, fakeVotesRepository);
+    }
+
     [Fact]
     public async Task CreatePoll_InsertsPollInDb()
     {
         // Given
-        var createPollRequest =
-            new CreatePollRequest("Test Poll", DateTime.UtcNow, new List<DateTime> { DateTime.UtcNow });
-        var pollRepository = new FakePollsRepository();
-        var application = new PollApplication(pollRepository, new FakeVotesRepository());
+        var createPollRequest = new CreatePollRequest(
+            "Test Poll",
+            DateTime.UtcNow,
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+        );
+
+        // When
+        Poll result = await pollApplication.CreatePoll(createPollRequest);
+
+        // Then
+        fakePollsRepository.Data[result.Id].Should().Be(result);
+    }
+
+    [Fact]
+    public async Task CreatePoll_WhenLoggedIn_InsertsPollInDbWithAuthorId()
+    {
+        // Given
+        var fakeCurrentUserId = Guid.NewGuid();
+        var application = new PollApplication(fakePollsRepository, fakeVotesRepository, fakeCurrentUserId);
+
+        var createPollRequest = new CreatePollRequest(
+            "Test Poll",
+            DateTime.UtcNow, new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+        );
 
         // When
         Poll result = await application.CreatePoll(createPollRequest);
 
         // Then
-        pollRepository.Data[result.Id].Should().Be(result);
+        fakePollsRepository.Data[result.Id].Should().Be(result);
+        fakePollsRepository.Data[result.Id].AuthorId.Should().Be(fakeCurrentUserId);
     }
 
     [Fact]
     public async Task GetPoll_Exists_InsertsPoll()
     {
         // Given
-        var pollRepository = new FakePollsRepository();
-        Poll poll = await BuildAndInsertPoll(pollRepository);
-        var application = new PollApplication(pollRepository, new FakeVotesRepository());
+        Poll poll = await BuildAndInsertPoll();
 
         // When
-        Poll? result = await application.GetPoll(poll.Id);
+        Poll? result = await pollApplication.GetPoll(poll.Id);
 
         // Then
         result.Should().NotBeNull();
-        pollRepository.Data[poll.Id].Should().Be(poll);
+        fakePollsRepository.Data[poll.Id].Should().Be(poll);
     }
 
     [Fact]
     public async Task GetPoll_DoesntExists_ReturnsNullAnd()
     {
-        // Given
-        var application = new PollApplication(new FakePollsRepository(), new FakeVotesRepository());
-
         // When
-        Poll? result = await application.GetPoll(Guid.NewGuid());
+        Poll? result = await pollApplication.GetPoll(Guid.NewGuid());
 
         // Then
         result.Should().BeNull();
@@ -56,10 +82,7 @@ public class PollsApplicationTests
     public async Task Vote_InsertsVoteInDb()
     {
         // Given
-        var pollRepository = new FakePollsRepository();
-        Poll poll = await BuildAndInsertPoll(pollRepository);
-        var fakeVotesRepository = new FakeVotesRepository();
-        var application = new PollApplication(pollRepository, fakeVotesRepository);
+        Poll poll = await BuildAndInsertPoll();
 
         var createVoteRequest = new CreateVoteRequest(
             "Test Voter Name",
@@ -74,7 +97,7 @@ public class PollsApplicationTests
         );
 
         // When
-        var vote = await application.Vote(poll.Id, createVoteRequest);
+        Vote vote = await pollApplication.Vote(poll.Id, createVoteRequest);
 
         // Then
         vote.PollId.Should().Be(poll.Id);
@@ -88,7 +111,7 @@ public class PollsApplicationTests
             Availability.NotAvailable,
             Availability.Available,
         });
-        var pollInDb = fakeVotesRepository.Data[vote.Id];
+        Vote pollInDb = fakeVotesRepository.Data[vote.Id];
         pollInDb.PollId.Should().Be(poll.Id);
         pollInDb.Id.Should().Be(vote.Id);
         pollInDb.VoterName.Should().Be(createVoteRequest.VoterName);
@@ -106,10 +129,7 @@ public class PollsApplicationTests
     public async Task DeleteVote_RemovesVoteFromDb()
     {
         // Given
-        var pollRepository = new FakePollsRepository();
-        Poll poll = await BuildAndInsertPoll(pollRepository);
-        var fakeVotesRepository = new FakeVotesRepository();
-        var application = new PollApplication(pollRepository, fakeVotesRepository);
+        Poll poll = await BuildAndInsertPoll();
 
         var vote = new Vote(poll.Id,
             "Test Voter Name"
@@ -127,26 +147,67 @@ public class PollsApplicationTests
         await fakeVotesRepository.Save(vote);
 
         // When
-        await application.RemoveVote(vote.Id);
+        await pollApplication.RemoveVote(vote.Id);
 
         // Then
         fakeVotesRepository.Data.Should().BeEmpty();
     }
 
+    [Fact]
+    public async Task GetCurrentUserPolls_NoCurrentUser_Throws()
+    {
+        // When
+        var act = async () => await pollApplication.GetCurrentUserPolls();
+        
+        // Then
+        await Assert.ThrowsAsync<ArgumentNullException>(act);
+    }
 
-    private static async Task<Poll> BuildAndInsertPoll(FakePollsRepository pollRepository)
+
+    [Fact]
+    public async Task GetCurrentUserPolls_ReturnsCorrectPolls()
+    {
+        // Given
+        var fakeCurrentUserId = Guid.NewGuid();
+        var otherFakeUserId = Guid.NewGuid();
+        var allPolls = await Task.WhenAll(
+            BuildAndInsertPoll(fakeCurrentUserId),
+            BuildAndInsertPoll(otherFakeUserId),
+            BuildAndInsertPoll(fakeCurrentUserId)
+        );
+
+        var application = new PollApplication(fakePollsRepository, fakeVotesRepository, fakeCurrentUserId);
+
+        // When
+        var currentUserPolls = (await application.GetCurrentUserPolls()).ToList();
+
+        // Then
+        currentUserPolls.Count().Should().Be(2);
+
+        var ids = currentUserPolls
+            .Select(poll => poll.Id)
+            .ToArray();
+
+        ids.Should().Contain(allPolls[0].Id);
+        ids.Should().Contain(allPolls[2].Id);
+    }
+
+    private async Task<Poll> BuildAndInsertPoll(Guid? authorId = null)
     {
         var poll = new Poll(
             "Test Poll",
-            new List<DateTime>
+            new DateTime[]
             {
                 new(2022, 11, 13),
                 new(2022, 11, 14),
                 new(2022, 11, 15),
                 new(2022, 11, 16),
                 new(2022, 11, 17),
-            });
-        await pollRepository.Insert(poll);
+            })
+        {
+            AuthorId = authorId
+        };
+        await fakePollsRepository.Insert(poll);
         return poll;
     }
 }

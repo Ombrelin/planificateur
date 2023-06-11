@@ -1,10 +1,13 @@
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Planificateur.Core.Contracts;
 using Planificateur.Tests.Shared;
 using Planificateur.Web.Database;
 using Planificateur.Web.Tests.Database;
+using Xunit;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 

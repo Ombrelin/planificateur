@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,16 +38,37 @@ public class Startup
         services.AddScoped<IPollsRepository, PollsRepository>();
         services.AddScoped<IVotesRepository, VotesRepository>();
         services.AddScoped<IApplicationUsersRepository, ApplicationUsersRepository>();
-        services.AddScoped<PollApplication>();
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddScoped<PollApplication>(services =>
+        {
+            HttpContext httpContext = (services
+                    .GetService<IHttpContextAccessor>()  ?? throw new InvalidOperationException("Not http context accessor when configuring access control manager"))
+                .HttpContext ?? throw new InvalidOperationException("Not http context when configuring access control manager");
+
+            string? currentUserIdString = httpContext.User.Claims.FirstOrDefault(claim => claim.Type is ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserIdString is null)
+            {
+                return new PollApplication(
+                    services.GetService<IPollsRepository>()!,
+                    services.GetService<IVotesRepository>()!
+                );
+            }
+
+            return new PollApplication(
+                services.GetService<IPollsRepository>()!,
+                services.GetService<IVotesRepository>()!,
+                Guid.Parse(currentUserIdString)
+            );
+        });
         services.AddScoped<AuthenticationApplication>(services => new AuthenticationApplication(
             services.GetService<IApplicationUsersRepository>(),
-            Configuration["JWT_SECRET"] ?? throw new ArgumentException("JWT_SECRET Env variable is not set"))
-        );
+            Configuration["JWT_SECRET"]
+        ));
         services.AddNpgsql<ApplicationDbContext>(
             new NpgsqlConnectionStringBuilder
             {
                 Host = Configuration["DB_HOST"],
-                Port = int.Parse(Configuration["DB_PORT"]),
+                Port = int.Parse(Configuration["DB_PORT"] ?? string.Empty),
                 Username = Configuration["DB_USERNAME"],
                 Password = Configuration["DB_PASSWORD"],
                 Database = Configuration["DB_NAME"]

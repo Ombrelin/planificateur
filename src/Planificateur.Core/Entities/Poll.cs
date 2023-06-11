@@ -8,33 +8,45 @@ public class Poll
     public string Name
     {
         get => name;
-        private set => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
+        private set => name = string.IsNullOrEmpty(value)
+            ? throw new ArgumentException("Poll name can't be empty")
+            : value;
     }
 
 
     public List<Vote> Votes { get; set; }
+    private DateTime[] dates;
 
-    private List<DateTime> dates = new();
-
-    public List<DateTime> Dates
+    public DateTime[] Dates
     {
         get => dates;
-        set => dates = value.Count is 0 ? throw new ArgumentException("Poll dates can't be empty") : value;
+        private set =>
+            dates = value.Length <= 1 ? throw new ArgumentException("Poll require at least two dates") : value;
     }
-    
+
     public DateTime ExpirationDate { get; set; }
-    
-    public Poll(string name, List<DateTime> dates) : this(Guid.NewGuid(), name, dates, DateTime.UtcNow.AddMonths(2), Array.Empty<Vote>())
+
+    public Poll(string name, IEnumerable<DateTime> dates) : this(
+        Guid.NewGuid(),
+        name,
+        dates
+            .OrderBy(date => date)
+            .ToArray(),
+        DateTime
+            .UtcNow
+            .AddMonths(2),
+        new List<Vote>()
+    )
     {
     }
 
-    public Poll(Guid id, string name, IEnumerable<DateTime> dates, DateTime expirationDate, IEnumerable<Vote> votes)
+    public Poll(Guid id, string name, DateTime[] dates, DateTime expirationDate, List<Vote> votes)
     {
         Id = id;
         Name = name;
-        Dates = dates.ToList();
+        Dates = dates;
         ExpirationDate = expirationDate;
-        Votes = votes.ToList();
+        Votes = votes;
     }
 
     public (IReadOnlyCollection<DateTime> dates, decimal? score) BestDates
@@ -54,6 +66,8 @@ public class Poll
                 bestScore);
         }
     }
+
+    public Guid? AuthorId { get; set; }
 
     private static DateTime[] ExtractBestDates(IEnumerable<(DateTime date, decimal score)> scoredDates,
         decimal bestScore)

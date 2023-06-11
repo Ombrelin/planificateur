@@ -27,6 +27,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(poll => poll.Name);
             entity.Property(poll => poll.Dates);
             entity.Property(poll => poll.ExpirationDate);
+            entity.Property(poll => poll.AuthorId);
         });
 
         modelBuilder.Entity<VoteEntity>(entity =>

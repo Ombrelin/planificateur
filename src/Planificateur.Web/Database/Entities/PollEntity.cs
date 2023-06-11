@@ -9,6 +9,8 @@ public class PollEntity : IEntity<Poll>
     public DateTime[] Dates { get; set; }
     public DateTime ExpirationDate { get; set; }
     public List<VoteEntity> Votes { get; set; }
+    
+    public Guid? AuthorId { get; set; }
 
     public PollEntity()
     {
@@ -24,6 +26,7 @@ public class PollEntity : IEntity<Poll>
             .Votes
             .Select(vote => new VoteEntity(vote))
             .ToList();
+        AuthorId = domainObject.AuthorId;
     }
 
     public Poll ToDomainObject() => new Poll(
@@ -33,5 +36,9 @@ public class PollEntity : IEntity<Poll>
         ExpirationDate,
         Votes
             .Select(entity => entity.ToDomainObject())
-    );
+            .ToList()
+    )
+    {
+        AuthorId = AuthorId
+    };
 }

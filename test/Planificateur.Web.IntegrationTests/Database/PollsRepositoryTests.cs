@@ -1,9 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Database;
 using Planificateur.Web.Database.Entities;
 using Planificateur.Web.Database.Repositories;
+using Xunit;
 
 namespace Planificateur.Web.Tests.Database;
 
@@ -26,10 +31,11 @@ public class PollsRepositoryTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
-            ExpirationDate = DateTime.UtcNow.AddDays(10)
+            ExpirationDate = DateTime.UtcNow.AddDays(10),
+            AuthorId = Guid.NewGuid()
         };
 
         // When
@@ -40,6 +46,7 @@ public class PollsRepositoryTests
         pollInDb.Dates.Should().BeEquivalentTo(poll.Dates);
         pollInDb.ExpirationDate.Should().Be(poll.ExpirationDate);
         pollInDb.Name.Should().Be(poll.Name);
+        pollInDb.AuthorId.Should().Be(poll.AuthorId);
     }
 
     [Fact]
@@ -49,7 +56,7 @@ public class PollsRepositoryTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)
@@ -80,7 +87,7 @@ public class PollsRepositoryTests
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)
@@ -105,13 +112,50 @@ public class PollsRepositoryTests
     }
 
     [Fact]
+    public async Task GetPollsByAuthorId_ReturnsCorrectPolls()
+    {
+        // Given
+        var authorId = Guid.NewGuid();
+        var pollFromAuthor = new Poll(
+            "Test Poll",
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+        ) { AuthorId = authorId };
+        var pollFromOtherAuthor = new Poll(
+            "Test Poll",
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+        ) { AuthorId = Guid.NewGuid() };
+        var otherPollFromAuthor = new Poll(
+            "Test Poll",
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+        ) { AuthorId = authorId };
+
+        await dbContext.Polls.AddAsync(new PollEntity(pollFromAuthor));
+        await dbContext.Polls.AddAsync(new PollEntity(pollFromOtherAuthor));
+        await dbContext.Polls.AddAsync(new PollEntity(otherPollFromAuthor));
+        await dbContext.SaveChangesAsync();
+
+        // When
+        var result = (await repository.GetPollsByAuthorId(authorId)).ToList();
+
+        // Then
+        result.Count().Should().Be(2);
+
+        var ids = result
+            .Select(poll => poll.Id)
+            .ToArray();
+
+        ids.Should().Contain(pollFromAuthor.Id);
+        ids.Should().Contain(otherPollFromAuthor.Id);
+    }
+
+    [Fact]
     public async Task Get_ExistingPoll_ReturnsPoll()
     {
         // Given
         var poll = new Poll
         (
             "Test Poll",
-            new List<DateTime> { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)

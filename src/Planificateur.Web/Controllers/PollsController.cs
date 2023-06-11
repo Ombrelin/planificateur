@@ -46,7 +46,7 @@ public class PollsController : Controller
             Dates = createPollRequest
                 .Dates
                 .Select(date => TimeZoneInfo.ConvertTimeToUtc(date, timeZoneInfo))
-                .ToList()
+                .ToArray()
         });
 
         return Redirect($"/polls/{poll.Id}");
