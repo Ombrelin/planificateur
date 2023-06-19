@@ -64,3 +64,11 @@ Requirement :
 cd src/Planificateur.Web
 dotnet run
 ```
+
+# Screenshots
+
+![Creation form](screenshots/create-poll.png)
+
+![Desktop poll UI](screenshots/poll.png)
+
+![Mobile poll UI](screenshots/poll-mobile.png)
