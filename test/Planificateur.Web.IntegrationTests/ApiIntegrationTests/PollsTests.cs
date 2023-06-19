@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +8,6 @@ using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Database.Entities;
 using Planificateur.Web.Tests.Database;
-using Xunit;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
@@ -209,7 +204,7 @@ public class PollsTests : ApiIntegrationTests
         voteFromDb.PollId.Should().Be(poll.Id);
     }
 
-    [Fact(Skip = "404 not handled")]
+    [Fact]
     public async Task Vote_NonExistingPoll_Returns404()
     {
         // Given

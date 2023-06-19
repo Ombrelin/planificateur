@@ -79,10 +79,9 @@ public class PollTests
                 new(2022, 11, 17),
                 new(2022, 11, 13),
                 new(2022, 11, 15),
-                
             }
         );
-        
+
         // Then
         poll.Dates[0].Should().Be(new DateTime(2022, 11, 13));
         poll.Dates[1].Should().Be(new DateTime(2022, 11, 14));

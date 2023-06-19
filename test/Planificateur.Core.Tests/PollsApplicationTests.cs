@@ -158,7 +158,7 @@ public class PollsApplicationTests
     {
         // When
         var act = async () => await pollApplication.GetCurrentUserPolls();
-        
+
         // Then
         await Assert.ThrowsAsync<ArgumentNullException>(act);
     }

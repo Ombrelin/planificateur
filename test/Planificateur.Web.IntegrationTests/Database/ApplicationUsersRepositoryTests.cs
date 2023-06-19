@@ -14,7 +14,7 @@ public class ApplicationUsersRepositoryTests
     private readonly ApplicationUsersRepository repository;
     private readonly ApplicationDbContext dbContext;
     private readonly DataFactory dataFactory = new();
-    
+
     public ApplicationUsersRepositoryTests(DatabaseFixture database)
     {
         dbContext = database.DbContext;

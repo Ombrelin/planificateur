@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Planificateur.Web.Tests.Database;
 
 [CollectionDefinition("Database Tests")]

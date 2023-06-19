@@ -62,14 +62,34 @@ public class PollsController : Controller
     [HttpPost("{id:guid}/votes")]
     public async Task<IActionResult> AddVote(Guid id, IFormCollection data)
     {
+        if (!data.ContainsKey("voterName"))
+        {
+            return BadRequest("Voter Name is required");
+        }
+
+        var availabilities = ParseAvailabilities(data);
+
+        if (availabilities.Any(availability => availability is null))
+        {
+            return BadRequest("Invalid availability value");
+        }
+
         var vote = new CreateVoteRequest(
-            data["voterName"],
-            data
-                .Where(formData => formData.Key.Contains("availability"))
-                .Select(value => Enum.Parse<Availability>(value.Value))
-                .ToList()
+            data["voterName"]!,
+            availabilities.Select(availability => availability!.Value)
         );
+        
         await pollApplication.Vote(id, vote);
         return Redirect($"/polls/{id}");
+    }
+
+    private static List<Availability?> ParseAvailabilities(IFormCollection data)
+    {
+        var availabilities = data
+            .Where(formData => formData.Key.Contains("availability"))
+            .Select(value =>
+                Enum.TryParse(value.Value, out Availability availability) ? availability : (Availability?)null)
+            .ToList();
+        return availabilities;
     }
 }

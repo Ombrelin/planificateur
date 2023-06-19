@@ -67,7 +67,7 @@ public class AuthenticationApplication
     {
         return new SecurityTokenDescriptor()
         {
-            Subject = new ClaimsIdentity(new Claim[]
+            Subject = new ClaimsIdentity(new []
             {
                 new Claim(ClaimTypes.NameIdentifier, applicationUser.Id.ToString()),
                 new Claim(ClaimTypes.Name, applicationUser.Username),

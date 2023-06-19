@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
+using Planificateur.Core.Exceptions;
 using Planificateur.Web.Database;
 using Planificateur.Web.Database.Entities;
 using Planificateur.Web.Database.Repositories;
@@ -26,7 +27,7 @@ public class VotesRepositoryTests
         var poll = new Poll
         (
             "Test Poll",
-            new [] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)
@@ -64,7 +65,7 @@ public class VotesRepositoryTests
         var poll = new Poll
         (
             "Test Poll",
-            new [] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)
@@ -88,13 +89,26 @@ public class VotesRepositoryTests
     }
 
     [Fact]
+    public async Task Save_NonExistingPoll_ThrowsResourceNotFound()
+    {
+        // Given
+        var vote = new Vote(Guid.NewGuid(), "Test Voter Name");
+
+        // When
+        var act = async () => await repository.Save(vote);
+
+        // Then
+        await Assert.ThrowsAsync<NotFoundException>(act);
+    }
+
+    [Fact]
     public async Task Save_ExistingRecord_UpdatesInDb()
     {
         // Given
         var poll = new Poll
         (
             "Test Poll",
-            new [] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         )
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)

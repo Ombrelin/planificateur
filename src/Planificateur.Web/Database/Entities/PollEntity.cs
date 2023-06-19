@@ -9,7 +9,7 @@ public class PollEntity : IEntity<Poll>
     public DateTime[] Dates { get; set; }
     public DateTime ExpirationDate { get; set; }
     public List<VoteEntity> Votes { get; set; }
-    
+
     public Guid? AuthorId { get; set; }
 
     public PollEntity()

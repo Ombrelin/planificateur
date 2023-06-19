@@ -10,7 +10,8 @@ public class PollApplication
     private readonly IVotesRepository votesRepository;
     private readonly Guid? currentUserId;
 
-    public PollApplication(IPollsRepository pollsRepository, IVotesRepository votesRepository, Guid? currentUserId = null)
+    public PollApplication(IPollsRepository pollsRepository, IVotesRepository votesRepository,
+        Guid? currentUserId = null)
     {
         this.pollsRepository = pollsRepository;
         this.votesRepository = votesRepository;
@@ -58,6 +59,7 @@ public class PollApplication
         {
             throw new ArgumentNullException();
         }
+
         return await this.pollsRepository.GetPollsByAuthorId(this.currentUserId.Value);
     }
 }

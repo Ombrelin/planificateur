@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
+using Planificateur.Core.Exceptions;
 using Planificateur.Core.Repositories;
 using Planificateur.Web.Database.Entities;
 
@@ -8,6 +9,11 @@ namespace Planificateur.Web.Database.Repositories;
 public class VotesRepository : IVotesRepository
 {
     private readonly ApplicationDbContext dbContext;
+
+    private const string PrivateKeyViolationMessage =
+        """
+        23503: insert or update on table "Votes" violates foreign key constraint "FK_Votes_Polls_PollId
+        """;
 
     public VotesRepository(ApplicationDbContext dbContext)
     {
@@ -24,10 +30,11 @@ public class VotesRepository : IVotesRepository
             await dbContext.SaveChangesAsync();
         }
     }
+
     public async Task Save(Vote vote)
     {
         VoteEntity? entity = await FindById(vote.Id);
-        
+
         if (entity is null)
         {
             await dbContext.Votes.AddAsync(new VoteEntity(vote));
@@ -37,7 +44,14 @@ public class VotesRepository : IVotesRepository
             entity.Availabilities = vote.Availabilities.ToArray();
         }
 
-        await dbContext.SaveChangesAsync();
+        try
+        {
+            await dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException e) when (e.InnerException?.Message.Contains(PrivateKeyViolationMessage) ?? false)
+        {
+            throw new NotFoundException($"Not poll with id {vote.PollId}");
+        }
     }
 
     private async Task<VoteEntity?> FindById(Guid id)

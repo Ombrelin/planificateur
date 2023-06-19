@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Database;
 using Planificateur.Web.Database.Entities;
 using Planificateur.Web.Database.Repositories;
-using Xunit;
 
 namespace Planificateur.Web.Tests.Database;
 

@@ -19,7 +19,7 @@ public record CreatePollRequest(
     /// <summary>
     /// Date on which the Poll will be deleted from the database.
     /// </summary>
-    public DateTime ExpirationDate { get; init; } = ExpirationDate;
+    public DateTime ExpirationDate { get; } = ExpirationDate;
 
     /// <summary>
     /// Date choices available in the Poll.

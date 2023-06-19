@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Planificateur.Core.Entities;
 using Planificateur.Web.Database.Entities;
 
 namespace Planificateur.Web.Database;

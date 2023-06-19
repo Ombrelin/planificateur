@@ -19,5 +19,5 @@ public class ApplicationUserEntity : IEntity<ApplicationUser>
         Password = applicationUser.Password;
     }
 
-    public ApplicationUser ToDomainObject() => new (Id, Username, Password);
+    public ApplicationUser ToDomainObject() => new(Id, Username, Password);
 }

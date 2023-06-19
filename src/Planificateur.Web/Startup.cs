@@ -39,29 +39,34 @@ public class Startup
         services.AddScoped<IVotesRepository, VotesRepository>();
         services.AddScoped<IApplicationUsersRepository, ApplicationUsersRepository>();
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddScoped<PollApplication>(services =>
+        services.AddScoped<PollApplication>(servicesProvider =>
         {
-            HttpContext httpContext = (services
-                    .GetService<IHttpContextAccessor>()  ?? throw new InvalidOperationException("Not http context accessor when configuring access control manager"))
-                .HttpContext ?? throw new InvalidOperationException("Not http context when configuring access control manager");
+            HttpContext httpContext = (servicesProvider
+                                           .GetService<IHttpContextAccessor>() ??
+                                       throw new InvalidOperationException(
+                                           "Not http context accessor when configuring access control manager"))
+                                      .HttpContext ??
+                                      throw new InvalidOperationException(
+                                          "Not http context when configuring access control manager");
 
-            string? currentUserIdString = httpContext.User.Claims.FirstOrDefault(claim => claim.Type is ClaimTypes.NameIdentifier)?.Value;
+            string? currentUserIdString = httpContext.User.Claims
+                .FirstOrDefault(claim => claim.Type is ClaimTypes.NameIdentifier)?.Value;
             if (currentUserIdString is null)
             {
                 return new PollApplication(
-                    services.GetService<IPollsRepository>()!,
-                    services.GetService<IVotesRepository>()!
+                    servicesProvider.GetService<IPollsRepository>()!,
+                    servicesProvider.GetService<IVotesRepository>()!
                 );
             }
 
             return new PollApplication(
-                services.GetService<IPollsRepository>()!,
-                services.GetService<IVotesRepository>()!,
+                servicesProvider.GetService<IPollsRepository>()!,
+                servicesProvider.GetService<IVotesRepository>()!,
                 Guid.Parse(currentUserIdString)
             );
         });
-        services.AddScoped<AuthenticationApplication>(services => new AuthenticationApplication(
-            services.GetService<IApplicationUsersRepository>(),
+        services.AddScoped<AuthenticationApplication>(servicesProvider => new AuthenticationApplication(
+            servicesProvider.GetService<IApplicationUsersRepository>(),
             Configuration["JWT_SECRET"]
         ));
         services.AddNpgsql<ApplicationDbContext>(

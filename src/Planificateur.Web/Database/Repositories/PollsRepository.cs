@@ -38,7 +38,7 @@ public class PollsRepository : IPollsRepository
             .Polls
             .Where(entity => entity.AuthorId == authorId)
             .ToArrayAsync();
-        
+
         return queryResult
             .Select(entity => entity.ToDomainObject());
     }

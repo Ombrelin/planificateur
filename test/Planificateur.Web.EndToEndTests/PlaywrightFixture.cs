@@ -4,17 +4,17 @@ namespace Planificateur.Web.EndToEndTests;
 
 public class PlaywrightFixture : IAsyncLifetime
 {
-    private IPlaywright playwright;
-    private IBrowser browser;
+    private IPlaywright? playwright;
+    private IBrowser? browser;
 
-    public IPage Page { get; private set; }
+    public IPage? Page { get; private set; }
 
 
     public async Task InitializeAsync()
     {
         playwright = await Playwright.CreateAsync();
         bool isContinuousIntegration = bool.Parse(Environment.GetEnvironmentVariable("IS_CI") ?? bool.FalseString);
-        BrowserTypeLaunchOptions? browserTypeLaunchOptions = isContinuousIntegration
+        BrowserTypeLaunchOptions browserTypeLaunchOptions = isContinuousIntegration
             ? new BrowserTypeLaunchOptions
             {
                 Headless = true
@@ -30,7 +30,11 @@ public class PlaywrightFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await browser.DisposeAsync();
-        playwright.Dispose();
+        if (browser is not null)
+        {
+            await browser.DisposeAsync();   
+        }
+
+        playwright?.Dispose();
     }
 }
