@@ -8,32 +8,32 @@
              x:DataType="viewModels:LoginPageViewModel">
 
     <Grid Margin="16">
-        <Grid.RowDefinitions>*,.5*,*,*,*,*</Grid.RowDefinitions>
-        <Label FontSize="24" Width="200" HorizontalContentAlignment="Center" HorizontalAlignment="Center">Login to Planificateur</Label>
+        <Grid.RowDefinitions>*,2*,*,*,*,*</Grid.RowDefinitions>
+        <StackPanel>
+            <Label FontSize="24" Width="300" HorizontalContentAlignment="Center" HorizontalAlignment="Center">Login to Planificateur</Label>
+        </StackPanel>
         <StackPanel Grid.Row="1">
             <Image Width="150" Height="150" VerticalAlignment="Center" Source="/Assets/avalonia-logo.ico" />
         </StackPanel>
-        <Grid Grid.Row="3">
-            <Grid.RowDefinitions>*,*,*</Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
-                <Label>Server URL :</Label>
+        <StackPanel Grid.Row="2" Spacing="16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Classes="FieldLabel">Server URL :</Label>
                 <TextBox Text="{CompiledBinding ServerUrl}" />
             </StackPanel>
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
-                <Label>Username :</Label>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
+                <Label Classes="FieldLabel">Username :</Label>
                 <TextBox Text="{CompiledBinding Username}" />
             </StackPanel>
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
-                <Label>Password :</Label>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Classes="FieldLabel">Password :</Label>
                 <TextBox PasswordChar="•" Text="{CompiledBinding Password}" />
             </StackPanel>
             <Button
-                Grid.Row="2"
                 Command="{Binding LoginCommand}"
                 HorizontalAlignment="Center">
                 Login
             </Button>
-        </Grid>
+        </StackPanel>
 
     </Grid>
 

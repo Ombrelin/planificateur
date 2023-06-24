@@ -14,7 +14,7 @@
 
 
     <ItemGroup>
-        <ProjectReference Include="..\Planificateur.Core\Planificateur.Core.csproj" />
+        <ProjectReference Include="..\Planificateur.Core\Planificateur.Core.csproj"/>
     </ItemGroup>
     <ItemGroup>
         <Content Include="Views\*.cshtml">
@@ -22,7 +22,7 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -31,7 +31,16 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
     </ItemGroup>
+    <ItemGroup>
+        <Content Include="Views\*.cshtml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    <Target Name="SwaggerPostBuildTarget" AfterTargets="Build">
+        <Exec Command="dotnet tool restore"></Exec>
+        <Exec Command="dotnet tool run swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1"></Exec>
+    </Target>
 </Project>

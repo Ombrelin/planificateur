@@ -1,0 +1,19 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+             x:Class="Planificateur.UI.App"
+             RequestedThemeVariant="Default">
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Styles>
+        <Style Selector="Button,TextBox, Label.FieldLabel, ComboBox">
+            <Setter Property="Width" Value="200" />
+            <Setter Property="Height" Value="32" />
+        </Style>
+        <Style Selector="Label.FieldLabel">
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        </Style>
+        <FluentTheme />
+        <styling:FluentAvaloniaTheme />
+    </Application.Styles>
+</Application>
