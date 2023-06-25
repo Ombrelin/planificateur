@@ -53,13 +53,16 @@ public class PollApplication
         await this.votesRepository.Delete(voteId);
     }
 
-    public async Task<IEnumerable<Poll>> GetCurrentUserPolls()
+    public async Task<IReadOnlyCollection<PollWithoutVotes>> GetCurrentUserPolls()
     {
         if (this.currentUserId is null)
         {
             throw new ArgumentNullException();
         }
 
-        return await this.pollsRepository.GetPollsByAuthorId(this.currentUserId.Value);
+        var polls = await this.pollsRepository.GetPollsByAuthorId(this.currentUserId.Value);
+        return polls
+            .Select(poll => new PollWithoutVotes(poll.Id, poll.Dates, poll.ExpirationDate))
+            .ToList();
     }
 }

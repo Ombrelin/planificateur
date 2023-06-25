@@ -1,3 +1,4 @@
+using System.Collections;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planificateur.Core;
@@ -45,6 +46,16 @@ public class PollsApiController : ControllerBase
         }
 
         return NotFound();
+    }
+
+    /// <summary>
+    /// Get the polls for which the current authenticated user is the author.
+    /// </summary>
+    /// <returns>The corresponding list of polls.</returns>
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyCollection<IReadOnlyPollWithoutVotes>>> GetPolls()
+    {
+        return Ok(await pollApplication.GetCurrentUserPolls());
     }
 
     /// <summary>

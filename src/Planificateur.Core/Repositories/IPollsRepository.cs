@@ -6,5 +6,5 @@ public interface IPollsRepository
 {
     Task<Poll> Insert(Poll poll);
     Task<Poll?> Get(Guid id);
-    Task<IEnumerable<Poll>> GetPollsByAuthorId(Guid currentUserId);
+    Task<IReadOnlyCollection<IReadOnlyPollWithoutVotes>> GetPollsByAuthorId(Guid currentUserId);
 }

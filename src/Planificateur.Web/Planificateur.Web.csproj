@@ -39,8 +39,4 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
-    <Target Name="SwaggerPostBuildTarget" AfterTargets="Build">
-        <Exec Command="dotnet tool restore"></Exec>
-        <Exec Command="dotnet tool run swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1"></Exec>
-    </Target>
 </Project>

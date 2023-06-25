@@ -1,6 +1,6 @@
 namespace Planificateur.Core.Entities;
 
-public class Poll
+public class Poll: IReadOnlyPollWithoutVotes
 {
     public Guid Id { get; }
     private string name;

@@ -9,14 +9,12 @@ using Planificateur.Web.Database.Repositories;
 namespace Planificateur.Web.Tests.Database;
 
 [Collection("Database Tests")]
-public class VotesRepositoryTests
+public class VotesRepositoryTests : DatabaseTests
 {
     private readonly VotesRepository repository;
-    private readonly ApplicationDbContext dbContext;
 
-    public VotesRepositoryTests(DatabaseFixture database)
+    public VotesRepositoryTests(DatabaseFixture database): base(database.DbContext)
     {
-        dbContext = database.DbContext;
         repository = new VotesRepository(dbContext);
     }
 
@@ -35,16 +33,21 @@ public class VotesRepositoryTests
         var vote = new Vote(poll.Id, "Test Voter Name");
         poll.Votes = new List<Vote> { vote };
 
-        await dbContext.AddAsync(new PollEntity(poll));
+        var pollEntity = new PollEntity(poll);
+        await dbContext.AddAsync(pollEntity);
         await dbContext.SaveChangesAsync();
+        dbContext.ChangeTracker.Clear();
 
         // When
         await repository.Delete(vote.Id);
-
+        
         // Then
         VoteEntity? voteInDb = await dbContext.Votes.FirstOrDefaultAsync(record => record.Id == vote.Id);
         voteInDb.Should().BeNull();
-        PollEntity? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
+        PollEntity? pollInDb = await dbContext
+            .Polls
+            .Include(p => p.Votes)
+            .FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
         Assert.NotNull(pollInDb);
         pollInDb.Votes.Should().BeEmpty();
     }

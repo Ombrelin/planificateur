@@ -32,14 +32,15 @@ public class PollsRepository : IPollsRepository
         return entity?.ToDomainObject();
     }
 
-    public async Task<IEnumerable<Poll>> GetPollsByAuthorId(Guid authorId)
+    public async Task<IReadOnlyCollection<IReadOnlyPollWithoutVotes>> GetPollsByAuthorId(Guid authorId)
     {
         var queryResult = await dbContext
             .Polls
             .Where(entity => entity.AuthorId == authorId)
-            .ToArrayAsync();
+            .ToListAsync();
 
         return queryResult
-            .Select(entity => entity.ToDomainObject());
+            .Select(entity => entity.ToDomainObject())
+            .ToList();
     }
 }

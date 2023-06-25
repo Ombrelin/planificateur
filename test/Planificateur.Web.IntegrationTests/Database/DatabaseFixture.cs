@@ -6,13 +6,8 @@ namespace Planificateur.Web.Tests.Database;
 
 public class DatabaseFixture : IAsyncLifetime
 {
-    public ApplicationDbContext DbContext { get; }
-
-    public DatabaseFixture()
-    {
-        DbContext = BuildNewDbContext();
-    }
-
+    public ApplicationDbContext DbContext => BuildNewDbContext();
+    
     public static ApplicationDbContext BuildNewDbContext()
     {
         string? dbPort = Environment.GetEnvironmentVariable("DB_PORT");
@@ -32,7 +27,8 @@ public class DatabaseFixture : IAsyncLifetime
             Port = int.Parse(dbPort),
             Username = dbUserName,
             Password = dbPassword,
-            Database = dbName
+            Database = dbName,
+            IncludeErrorDetail = true
         };
         DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseNpgsql(builder.ToString())

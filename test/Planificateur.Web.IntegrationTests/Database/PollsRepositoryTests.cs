@@ -8,14 +8,12 @@ using Planificateur.Web.Database.Repositories;
 namespace Planificateur.Web.Tests.Database;
 
 [Collection("Database Tests")]
-public class PollsRepositoryTests
+public class PollsRepositoryTests : DatabaseTests
 {
     private readonly PollsRepository repository;
-    private readonly ApplicationDbContext dbContext;
 
-    public PollsRepositoryTests(DatabaseFixture database)
+    public PollsRepositoryTests(DatabaseFixture database) : base(database.DbContext)
     {
-        dbContext = database.DbContext;
         repository = new PollsRepository(dbContext);
     }
 

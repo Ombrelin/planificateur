@@ -15,8 +15,14 @@ public class FakePollsRepository : IPollsRepository
 
     public Task<Poll?> Get(Guid id) => Task.FromResult(Data.ContainsKey(id) ? Data[id] : null);
 
-    public Task<IEnumerable<Poll>> GetPollsByAuthorId(Guid currentUserId)
+    public Task<IReadOnlyCollection<IReadOnlyPollWithoutVotes>> GetPollsByAuthorId(Guid currentUserId)
     {
-        return Task.FromResult(Data.Values.Where(poll => poll.AuthorId == currentUserId));
+        var result = Data
+            .Values
+            .Where(poll => poll.AuthorId == currentUserId)
+            .Cast<IReadOnlyPollWithoutVotes>()
+            .ToList() as IReadOnlyCollection<IReadOnlyPollWithoutVotes>;
+        
+        return Task.FromResult(result);
     }
 }

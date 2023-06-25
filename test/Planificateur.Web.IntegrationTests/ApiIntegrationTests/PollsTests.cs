@@ -162,13 +162,7 @@ public class PollsTests : ApiIntegrationTests
     public async Task Vote_ExistingPoll_InsertsVote()
     {
         // Given
-        var poll = new Poll
-        (
-            "Test Poll",
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
-        );
-        await DbContext.Polls.AddAsync(new PollEntity(poll));
-        await DbContext.SaveChangesAsync();
+        Poll poll = await InsertNewPoll();
 
         var voteRequest =
             new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
@@ -204,6 +198,18 @@ public class PollsTests : ApiIntegrationTests
         voteFromDb.PollId.Should().Be(poll.Id);
     }
 
+    private async Task<Poll> InsertNewPoll()
+    {
+        var poll = new Poll
+        (
+            "Test Poll",
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+        );
+        await DbContext.Polls.AddAsync(new PollEntity(poll));
+        await DbContext.SaveChangesAsync();
+        return poll;
+    }
+
     [Fact]
     public async Task Vote_NonExistingPoll_Returns404()
     {
@@ -216,5 +222,65 @@ public class PollsTests : ApiIntegrationTests
 
         // Then
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetPolls_ReturnsCurrentUserPolls()
+    {
+        // Given
+        var otherPoll = new Poll
+        (
+            "Test Poll",
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+        );
+
+        Guid userId = Guid.Parse((await RegisterNewUser()).Id.ToString());
+        await Login();
+
+        var pollFromCurrentUser = new Poll
+        (
+            "Test Poll",
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+        )
+        {
+            AuthorId = userId
+        };
+
+        var otherPollFromCurrentUser = new Poll
+        (
+            "Test Poll",
+            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+        )
+        {
+            AuthorId = userId
+        };
+
+        await DbContext.Polls.AddRangeAsync(
+            new PollEntity(otherPoll),
+            new PollEntity(pollFromCurrentUser),
+            new PollEntity(otherPollFromCurrentUser)
+        );
+        await DbContext.SaveChangesAsync();
+
+
+        // When
+        HttpResponseMessage response = await Client.GetAsync("/api/polls");
+
+        // Then
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        using JsonDocument pollsFromResponse =
+            await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        var pollsJson = pollsFromResponse.RootElement.EnumerateArray().ToList();
+        pollsJson
+            .Should()
+            .HaveCount(2);
+
+        var userPollsIds = new[] { pollFromCurrentUser.Id.ToString(), otherPollFromCurrentUser.Id.ToString() };
+        pollsJson
+            .Should()
+            .AllSatisfy(pollJson => userPollsIds.Should().Contain(pollJson.GetProperty("id").GetString()))
+            .And
+            .AllSatisfy(pollJson => pollJson.EnumerateObject().Where(property => property.Name is "votes").Should().BeEmpty());
     }
 }

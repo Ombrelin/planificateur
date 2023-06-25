@@ -6,6 +6,8 @@ namespace Planificateur.Web.Json;
 
 [JsonSerializable(typeof(CreatePollRequest))]
 [JsonSerializable(typeof(Poll))]
+[JsonSerializable(typeof(Poll[]))]
+[JsonSerializable(typeof(List<PollWithoutVotes>))]
 [JsonSerializable(typeof(object))]
 [JsonSerializable(typeof(CreateVoteRequest))]
 [JsonSerializable(typeof(RegisterRequest))]
