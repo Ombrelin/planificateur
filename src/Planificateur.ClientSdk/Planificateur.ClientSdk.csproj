@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <PackageId>Planificateur.ClientSdk</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Arsène Lapostolet</Authors>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Planificateur.Core\Planificateur.Core.csproj" />
+      <ProjectReference Include="..\Planificateur.Web\Planificateur.Web.csproj" />
+    </ItemGroup>
+</Project>
