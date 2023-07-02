@@ -1,11 +1,10 @@
-@using System.Globalization
 @using Planificateur.Core.Entities
-@model Planificateur.Core.Entities.Poll?
+@using Vote = Planificateur.Core.Contracts.Vote
+@model Planificateur.Core.Contracts.PollWithVotes?
 
 @{
     Layout = "Layout";
     ViewData["Title"] = $"Poll - {(Model is null ? "Not Found" : Model.Name)}";
-    var culture = (CultureInfo)ViewData["culture"];
 }
 
 <div class="center">

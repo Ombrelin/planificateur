@@ -24,7 +24,7 @@ public class ViewPollPageObjectModel : PageObjectModel
         title.Should().Be(pollName);
 
         var formattedDatetimes = dateTimes
-            .Select(dateTime => (date: dateTime.ToString("dddd, MM/dd/yyyy"), time: dateTime.ToString("hh:mm")))
+            .Select(dateTime => (date: dateTime.ToString("dddd, MM/d/yyyy"), time: dateTime.ToString("hh:mm")))
             .ToList();
 
         var tableCells = await Page.QuerySelectorAllAsync("tbody>tr>td.date-cell");

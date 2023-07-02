@@ -33,7 +33,10 @@ public class PollsApplicationTests
         PollWithoutVotes result = await pollApplication.CreatePoll(createPollRequest);
 
         // Then
-        fakePollsRepository.Data[result.Id].Should().Be(result);
+        fakePollsRepository.Data[result.Id].Id.Should().Be(result.Id);
+        fakePollsRepository.Data[result.Id].Dates.Should().BeEquivalentTo(result.Dates);
+        fakePollsRepository.Data[result.Id].Name.Should().Be(result.Name);
+        fakePollsRepository.Data[result.Id].ExpirationDate.Should().Be(result.ExpirationDate);
     }
 
     [Fact]
@@ -52,7 +55,10 @@ public class PollsApplicationTests
         PollWithoutVotes result = await application.CreatePoll(createPollRequest);
 
         // Then
-        fakePollsRepository.Data[result.Id].Should().Be(result);
+        fakePollsRepository.Data[result.Id].Id.Should().Be(result.Id);
+        fakePollsRepository.Data[result.Id].Dates.Should().BeEquivalentTo(result.Dates);
+        fakePollsRepository.Data[result.Id].Name.Should().Be(result.Name);
+        fakePollsRepository.Data[result.Id].ExpirationDate.Should().Be(result.ExpirationDate);
         fakePollsRepository.Data[result.Id].AuthorId.Should().Be(fakeCurrentUserId);
     }
 
