@@ -41,7 +41,7 @@ public class PollsController : Controller
         StringValues timezone = data.First(kvp => kvp.Key is "timezone").Value;
         TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timezone);
 
-        Poll poll = await pollApplication.CreatePoll(createPollRequest with
+        PollWithoutVotes poll = await pollApplication.CreatePoll(createPollRequest with
         {
             Dates = createPollRequest
                 .Dates
@@ -55,7 +55,7 @@ public class PollsController : Controller
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> ViewPoll(Guid id)
     {
-        Poll? poll = await pollApplication.GetPoll(id);
+        PollWithVotes? poll = await pollApplication.GetPoll(id);
         return View("Views/Polls/Poll.cshtml", poll);
     }
 

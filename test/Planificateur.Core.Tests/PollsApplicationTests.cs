@@ -2,6 +2,8 @@ using FluentAssertions;
 using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
 using Planificateur.Core.Tests.Repositories;
+using Vote = Planificateur.Core.Entities.Vote;
+
 
 namespace Planificateur.Core.Tests;
 
@@ -28,7 +30,7 @@ public class PollsApplicationTests
         );
 
         // When
-        Poll result = await pollApplication.CreatePoll(createPollRequest);
+        PollWithoutVotes result = await pollApplication.CreatePoll(createPollRequest);
 
         // Then
         fakePollsRepository.Data[result.Id].Should().Be(result);
@@ -47,7 +49,7 @@ public class PollsApplicationTests
         );
 
         // When
-        Poll result = await application.CreatePoll(createPollRequest);
+        PollWithoutVotes result = await application.CreatePoll(createPollRequest);
 
         // Then
         fakePollsRepository.Data[result.Id].Should().Be(result);
@@ -61,7 +63,7 @@ public class PollsApplicationTests
         Poll poll = await BuildAndInsertPoll();
 
         // When
-        Poll? result = await pollApplication.GetPoll(poll.Id);
+        PollWithVotes? result = await pollApplication.GetPoll(poll.Id);
 
         // Then
         result.Should().NotBeNull();
@@ -72,7 +74,7 @@ public class PollsApplicationTests
     public async Task GetPoll_DoesntExists_ReturnsNullAnd()
     {
         // When
-        Poll? result = await pollApplication.GetPoll(Guid.NewGuid());
+        PollWithVotes? result = await pollApplication.GetPoll(Guid.NewGuid());
 
         // Then
         result.Should().BeNull();
@@ -97,10 +99,9 @@ public class PollsApplicationTests
         );
 
         // When
-        Vote vote = await pollApplication.Vote(poll.Id, createVoteRequest);
+        Contracts.Vote vote = await pollApplication.Vote(poll.Id, createVoteRequest);
 
         // Then
-        vote.PollId.Should().Be(poll.Id);
         vote.Id.Should().Be(vote.Id);
         vote.VoterName.Should().Be(createVoteRequest.VoterName);
         vote.Availabilities.Should().BeEquivalentTo(new List<Availability>

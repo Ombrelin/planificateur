@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -7,10 +8,7 @@ using Avalonia.Threading;
 using FluentAvalonia.Styling;
 using FluentAvalonia.UI.Controls;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Kiota.Abstractions;
-using Microsoft.Kiota.Abstractions.Authentication;
-using Microsoft.Kiota.Http.HttpClientLibrary;
-using Planificateur.ClientSdk;
+using Planificateur.ClientSdk.ClientSdk;
 using Planificateur.UI.Services;
 using Planificateur.UI.ViewModels.Services;
 using Planificateur.UI.ViewModels.ViewModels;
@@ -33,8 +31,7 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        var faTheme = AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>();
-        faTheme.RequestedTheme = "Dark";
+        FluentAvaloniaTheme faTheme = AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>() ?? throw new InvalidOperationException("FluentAvaloniaTheme not found in services");
         Frame? navigationFrame = null;
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -49,6 +46,8 @@ public partial class App : Application
             services.AddSingleton<IStorageService, MobileStorageService>();
         }
 
+        ArgumentNullException.ThrowIfNull(navigationFrame);
+        
         ConfigureApiClient();
         
         var navigationService = new NavigationService(navigationFrame);
@@ -59,10 +58,7 @@ public partial class App : Application
 
     private void ConfigureApiClient()
     {
-        this.services.AddSingleton<IAccessTokenProvider, TokenProvider>();
-        this.services.AddSingleton<IAuthenticationProvider, BaseBearerTokenAuthenticationProvider>();
-        this.services.AddSingleton<IRequestAdapter, HttpClientRequestAdapter>();
-        this.services.AddSingleton<IPlanificateurApi, PlanificateurApi>();
+        this.services.AddSingleton<PlanificateurClient>();
     }
 
     private void ConfigureNavigation(NavigationService navigationService)

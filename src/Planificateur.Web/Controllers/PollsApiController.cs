@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Planificateur.Core;
 using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
+using Vote = Planificateur.Core.Contracts.Vote;
 
 namespace Planificateur.Web.Controllers;
 
@@ -25,9 +26,9 @@ public class PollsApiController : ControllerBase
     /// <param name="createPollRequest"></param>
     /// <returns>The created Poll.</returns>
     [HttpPost]
-    public async Task<ActionResult<Poll>> CreatePoll([FromBody] CreatePollRequest createPollRequest)
+    public async Task<ActionResult<PollWithoutVotes>> CreatePoll([FromBody] CreatePollRequest createPollRequest)
     {
-        Poll poll = await pollApplication.CreatePoll(createPollRequest);
+        PollWithoutVotes poll = await pollApplication.CreatePoll(createPollRequest);
         return Created($"/api/polls/{poll.Id}", poll);
     }
 
@@ -37,9 +38,9 @@ public class PollsApiController : ControllerBase
     /// <param name="id">The Poll Id.</param>
     /// <returns>The corresponding Poll.</returns>
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<Poll>> GetPoll(Guid id)
+    public async Task<ActionResult<PollWithVotes>> GetPoll(Guid id)
     {
-        Poll? poll = await pollApplication.GetPoll(id);
+        PollWithVotes? poll = await pollApplication.GetPoll(id);
         if (poll is not null)
         {
             return Ok(poll);
@@ -75,8 +76,8 @@ public class PollsApiController : ControllerBase
     /// </summary>
     /// <param name="pollId">The id of the poll to which the vote belongs.</param>
     /// <param name="voteId">The id of the vote to delete.</param>
-    [HttpDelete("{id:guid}/votes/{voteId:guid}")]
-    public async Task<ActionResult<Poll>> RemoveVote(Guid pollId, Guid voteId)
+    [HttpDelete("{pollId:guid}/votes/{voteId:guid}")]
+    public async Task<IActionResult> RemoveVote(Guid pollId, Guid voteId)
     {
         await pollApplication.RemoveVote(voteId);
         return NoContent();

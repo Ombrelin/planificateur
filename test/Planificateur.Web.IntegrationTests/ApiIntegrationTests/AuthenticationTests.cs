@@ -29,16 +29,15 @@ public class AuthenticationTests : ApiIntegrationTests
         );
 
         // When
-        HttpResponseMessage response = await Client.PostAsJsonAsync("/api/authentication/register", request);
+        var (response, statusCode) = await Client.Register(request);
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var payload = await response.Content.ReadFromJsonAsync<RegisterResponse>();
-        Assert.NotNull(payload);
-        payload.Username.Should().Be(request.Username);
-        payload.Id.Should().NotBeEmpty();
+        statusCode.Should().Be(HttpStatusCode.Created);
+        Assert.NotNull(response);
+        response.Username.Should().Be(request.Username);
+        response.Id.Should().NotBeEmpty();
 
-        ApplicationUserEntity userInDb = await DbContext.Users.FirstAsync(u => u.Id == payload.Id);
+        ApplicationUserEntity userInDb = await DbContext.Users.FirstAsync(u => u.Id == response.Id);
         userInDb.Username.Should().Be(request.Username);
         userInDb.Password.Should().NotBeEmpty();
     }
@@ -51,14 +50,13 @@ public class AuthenticationTests : ApiIntegrationTests
         var request = new LoginRequest(user.Username, DataFactory.Password);
 
         // When
-        HttpResponseMessage response = await Client.PostAsJsonAsync("/api/authentication/login", request);
+        var (response, statusCode) = await Client.Login(request);
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        statusCode.Should().Be(HttpStatusCode.OK);
 
-        var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        Assert.NotNull(result);
-        result.Token.Should().NotBe(string.Empty);
+        Assert.NotNull(response);
+        response.Token.Should().NotBe(string.Empty);
     }
 
 
@@ -71,10 +69,10 @@ public class AuthenticationTests : ApiIntegrationTests
         var request = new LoginRequest("invalid username", "invalid passowrd");
 
         // When
-        HttpResponseMessage response = await Client.PostAsJsonAsync("/api/authentication/login", request);
+        var (response, statusCode) = await Client.Login(request);
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        statusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     private async Task<ApplicationUser> InsertTestApplicationUser()

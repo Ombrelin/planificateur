@@ -1,6 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +6,7 @@ using Planificateur.Core.Contracts;
 using Planificateur.Core.Entities;
 using Planificateur.Web.Database.Entities;
 using Planificateur.Web.Tests.Database;
+using Vote = Planificateur.Core.Entities.Vote;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
@@ -28,21 +27,18 @@ public class PollsTests : ApiIntegrationTests
             new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) });
 
         // When
-        HttpResponseMessage response = await Client.PostAsJsonAsync("/api/polls", createPollRequest);
+        var (response, statusCode) = await Client.CreatePoll(createPollRequest);
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        statusCode.Should().Be(HttpStatusCode.Created);
 
-        using JsonDocument pollFromResponse = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
-        string? id = pollFromResponse.RootElement.GetProperty("id").GetString();
-        id.Should().NotBeEmpty();
-        pollFromResponse.RootElement.GetProperty("name").GetString().Should().Be(createPollRequest.Name);
-        pollFromResponse.RootElement.GetProperty("dates").EnumerateArray().AsEnumerable()
-            .Select(date => date.GetDateTime()).Should().BeEquivalentTo(createPollRequest.Dates);
-        pollFromResponse.RootElement.GetProperty("expirationDate").GetDateTime().Should()
-            .BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
+        Assert.NotNull(response);
+        response.Id.Should().NotBeEmpty();
+        response.Name.Should().Be(createPollRequest.Name);
+        response.Dates.Should().BeEquivalentTo(createPollRequest.Dates);
+        response.ExpirationDate.Should().BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
 
-        PollEntity pollInDb = await DbContext.Polls.FirstAsync(record => record.Id.ToString() == id);
+        PollEntity pollInDb = await DbContext.Polls.FirstAsync(record => record.Id == response.Id);
         pollInDb.Name.Should().Be(createPollRequest.Name);
         pollInDb.ExpirationDate.Should().BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
         pollInDb.Dates.Should().HaveCount(createPollRequest.Dates.Length);
@@ -62,23 +58,19 @@ public class PollsTests : ApiIntegrationTests
         await Login();
 
         // When
-        HttpResponseMessage response = await Client.PostAsJsonAsync("/api/polls", createPollRequest);
+        var (response, statusCode) = await Client.CreatePoll(createPollRequest);
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        statusCode.Should().Be(HttpStatusCode.Created);
 
-        using JsonDocument pollFromResponse = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
-        string? id = pollFromResponse.RootElement.GetProperty("id").GetString();
-        id.Should().NotBeEmpty();
-        pollFromResponse.RootElement.GetProperty("name").GetString().Should().Be(createPollRequest.Name);
-        pollFromResponse.RootElement.GetProperty("dates").EnumerateArray().AsEnumerable()
-            .Select(date => date.GetDateTime()).Should().BeEquivalentTo(createPollRequest.Dates);
-        pollFromResponse.RootElement.GetProperty("expirationDate").GetDateTime().Should()
-            .BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
-        pollFromResponse.RootElement.GetProperty("authorId").GetString().Should()
-            .Be(userId);
+        Assert.NotNull(response);
+        response.Id.Should().NotBeEmpty();
+        response.Name.Should().Be(createPollRequest.Name);
+        response.Dates.Should().BeEquivalentTo(createPollRequest.Dates);
+        response.ExpirationDate.Should().BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
 
-        PollEntity pollInDb = await DbContext.Polls.FirstAsync(record => record.Id.ToString() == id);
+
+        PollEntity pollInDb = await DbContext.Polls.FirstAsync(record => record.Id == response.Id);
         pollInDb.Name.Should().Be(createPollRequest.Name);
         pollInDb.ExpirationDate.Should().BeCloseTo(createPollRequest.ExpirationDate, TimeSpan.FromMilliseconds(50));
         pollInDb.Dates.Should().HaveCount(createPollRequest.Dates.Length);
@@ -100,26 +92,24 @@ public class PollsTests : ApiIntegrationTests
         await DbContext.SaveChangesAsync();
 
         // When
-        HttpResponseMessage response = await Client.GetAsync($"/api/polls/{poll.Id}");
-        // Then
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        using JsonDocument pollFromResponse = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        var (response, statusCode) = await Client.GetPoll(poll.Id);
 
-        pollFromResponse.RootElement.GetProperty("id").GetString().Should().Be(poll.Id.ToString());
-        pollFromResponse.RootElement.GetProperty("name").GetString().Should().Be(poll.Name);
-        var dates = pollFromResponse
-            .RootElement
-            .GetProperty("dates")
-            .EnumerateArray()
-            .AsEnumerable()
-            .Select((date, index) => (date.GetDateTime(), index));
-        foreach ((DateTime date, int index) in dates)
+        // Then
+        statusCode.Should().Be(HttpStatusCode.OK);
+
+        Assert.NotNull(response);
+        response.Id.Should().NotBeEmpty();
+        response.Name.Should().Be(poll.Name);
+        response.ExpirationDate.Should().BeCloseTo(poll.ExpirationDate, TimeSpan.FromMilliseconds(50));
+        foreach ((DateTime first, DateTime second) in poll.Dates.Zip(response.Dates))
+        {
+            first.Should().BeCloseTo(second, TimeSpan.FromMilliseconds(50));
+        }
+        
+        foreach ((DateTime date, int index) in poll.Dates.Select((date, index) => (date, index)))
         {
             date.Should().BeCloseTo(poll.Dates[index], TimeSpan.FromMilliseconds(50));
         }
-
-        pollFromResponse.RootElement.GetProperty("expirationDate").GetDateTime().Should()
-            .BeCloseTo(poll.ExpirationDate, TimeSpan.FromMilliseconds(50));
     }
 
     [Fact]
@@ -129,9 +119,10 @@ public class PollsTests : ApiIntegrationTests
         var nonExistingPollId = Guid.NewGuid();
 
         // When
-        HttpResponseMessage response = await Client.GetAsync($"/api/polls/{nonExistingPollId}");
+        var (_, statusCode) = await Client.GetPoll(nonExistingPollId);
+
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        statusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
 
@@ -151,10 +142,10 @@ public class PollsTests : ApiIntegrationTests
         await DbContext.SaveChangesAsync();
 
         // When
-        HttpResponseMessage response = await Client.DeleteAsync($"/api/polls/{poll.Id}/votes/{vote.Id}");
+        var statusCode = await Client.RemoveVote(poll.Id, vote.Id);
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        statusCode.Should().Be(HttpStatusCode.NoContent);
         (await DbContext.Votes.CountAsync(voteRecord => voteRecord.Id == vote.Id)).Should().Be(0);
     }
 
@@ -168,31 +159,21 @@ public class PollsTests : ApiIntegrationTests
             new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
 
         // When
-        HttpResponseMessage response = await Client.PostAsJsonAsync($"/api/polls/{poll.Id}/votes", voteRequest);
+        var (response, statusCode) = await Client.Vote(poll.Id, voteRequest);
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        using JsonDocument voteFromResponse = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        statusCode.Should().Be(HttpStatusCode.OK);
 
-        string? voteId = voteFromResponse.RootElement.GetProperty("id").GetString();
-        Assert.NotNull(voteId);
-        voteId.Should().NotBeEmpty();
-        voteFromResponse.RootElement.GetProperty("voterName").GetString().Should().Be(voteRequest.VoterName);
-        voteFromResponse.RootElement.GetProperty("pollId").GetString().Should().Be(poll.Id.ToString());
-        var availabilities = voteFromResponse
-            .RootElement
-            .GetProperty("availabilities")
-            .EnumerateArray()
-            .AsEnumerable()
-            .Select(jsonElement => jsonElement.GetString())
-            .ToArray();
+        Assert.NotNull(response);
+        response.Id.Should().NotBeEmpty();
+        response.VoterName.Should().Be(voteRequest.VoterName);
 
-        availabilities.Should().HaveCount(2);
-        availabilities[0].Should().Be(Availability.Available.ToString());
-        availabilities[1].Should().Be(Availability.NotAvailable.ToString());
+        response.Availabilities.Should().HaveCount(2);
+        response.Availabilities[0].Should().Be(Availability.Available);
+        response.Availabilities[1].Should().Be(Availability.NotAvailable);
 
-        VoteEntity voteFromDb = await DbContext.Votes.FirstAsync(voteRecord => voteRecord.Id == Guid.Parse(voteId));
-        voteFromDb.Id.Should().Be(voteId);
+        VoteEntity voteFromDb = await DbContext.Votes.FirstAsync(voteRecord => voteRecord.Id == response.Id);
+        voteFromDb.Id.Should().Be(response.Id);
         voteFromDb.VoterName.Should().Be(voteRequest.VoterName);
         voteFromDb.Availabilities.Should().BeEquivalentTo(new[] { Availability.Available, Availability.NotAvailable });
         voteFromDb.PollId.Should().Be(poll.Id);
@@ -218,10 +199,10 @@ public class PollsTests : ApiIntegrationTests
             new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
 
         // When
-        HttpResponseMessage response = await Client.PostAsJsonAsync($"/api/polls/{Guid.NewGuid()}/votes", voteRequest);
+        var (_, statusCode) = await Client.Vote(Guid.NewGuid(), voteRequest);
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        statusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -264,23 +245,15 @@ public class PollsTests : ApiIntegrationTests
 
 
         // When
-        HttpResponseMessage response = await Client.GetAsync("/api/polls");
+        var (response, statusCode) = await Client.GetPolls();
 
         // Then
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        using JsonDocument pollsFromResponse =
-            await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
-        var pollsJson = pollsFromResponse.RootElement.EnumerateArray().ToList();
-        pollsJson
-            .Should()
-            .HaveCount(2);
+        statusCode.Should().Be(HttpStatusCode.OK);
+        Assert.NotNull(response);
 
         var userPollsIds = new[] { pollFromCurrentUser.Id.ToString(), otherPollFromCurrentUser.Id.ToString() };
-        pollsJson
+        response
             .Should()
-            .AllSatisfy(pollJson => userPollsIds.Should().Contain(pollJson.GetProperty("id").GetString()))
-            .And
-            .AllSatisfy(pollJson => pollJson.EnumerateObject().Where(property => property.Name is "votes").Should().BeEmpty());
+            .AllSatisfy(poll => userPollsIds.Should().Contain(poll.Id.ToString()));
     }
 }

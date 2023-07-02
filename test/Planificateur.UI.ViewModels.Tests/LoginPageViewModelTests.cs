@@ -1,5 +1,5 @@
 using Moq;
-using Planificateur.ClientSdk.Models;
+using Planificateur.Core.Contracts;
 using Planificateur.UI.ViewModels.Services;
 using Planificateur.UI.ViewModels.ViewModels;
 

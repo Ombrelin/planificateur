@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Planificateur.ClientSdk.ClientSdk;
 using Planificateur.Core.Contracts;
 using Planificateur.Tests.Shared;
 using Planificateur.Web.Database;
@@ -12,15 +13,15 @@ namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
 public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>, IClassFixture<DatabaseFixture>
 {
-    protected HttpClient Client;
+    protected PlanificateurClient Client;
     protected ApplicationDbContext DbContext;
     protected DataFactory DataFactory = new();
 
     private static int UserCount = 0;
-    
+
     public ApiIntegrationTests(WebApplicationFactory<Startup> webApplicationFactory, DatabaseFixture databaseFixture)
     {
-        Client = webApplicationFactory.CreateClient();
+        Client = new PlanificateurClient(webApplicationFactory.CreateClient());
         DbContext = databaseFixture.DbContext;
     }
 
@@ -30,28 +31,23 @@ public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
             $"{DataFactory.Username}-{++UserCount}",
             DataFactory.Password
         );
-        HttpResponseMessage response = await Client.PostAsJsonAsync("/api/authentication/register", request);
-
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var (response, statusCode) = await Client.Register(request);
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.Created, statusCode);
         
-        return (await response.Content.ReadFromJsonAsync<RegisterResponse>())!;
+        return response;
     }
 
     public async Task<LoginResponse> Login()
     {
-        HttpResponseMessage response = await Client.PostAsJsonAsync(
-            "/api/authentication/login",
-            new LoginRequest(
-                $"{DataFactory.Username}-{UserCount}",
-                DataFactory.Password
-            )
+        var loginRequest = new LoginRequest(
+            $"{DataFactory.Username}-{UserCount}",
+            DataFactory.Password
         );
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var loginResponse = (await response.Content.ReadFromJsonAsync<LoginResponse>())!;
 
-
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.Token);
-
-        return loginResponse;
+        var (response, statusCode) = await Client.Login(loginRequest);
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, statusCode);
+        return response;
     }
 }

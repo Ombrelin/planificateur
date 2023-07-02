@@ -1,4 +1,4 @@
-using Planificateur.ClientSdk.Models;
+using Planificateur.Core.Contracts;
 
 namespace Planificateur.UI.ViewModels.Services;
 
