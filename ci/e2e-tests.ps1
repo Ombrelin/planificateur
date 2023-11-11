@@ -11,7 +11,7 @@ docker run `
     -v "${pwd}:/app" `
     -w /app `
     ombrelin/dotnet7-playwright `
-    /bin/bash -c "dotnet build /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj && ~/bin/playwright install-deps && until [   '$(curl -s -w '%{http_code}' -o /dev/null 'http://planificateur-e2e')'   -eq 200 ]; do echo 'Waiting for app fo be up';   sleep 1; done && ~/bin/playwright install firefox && dotnet test /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj"
+    /bin/bash -c "dotnet build /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj && ~/bin/playwright install-deps && until [   '$(curl -s -w '%{http_code}' -o /dev/null 'http://planificateur-e2e')'   -eq '200' ]; do echo 'Waiting for app fo be up';   sleep 1; done && ~/bin/playwright install firefox && dotnet test /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj"
 
 $result = docker inspect planificateur-e2e-tests-exec --format='{{.State.ExitCode}}'
 
