@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
 
         <PackageId>Planificateur.ClientSdk</PackageId>
-        <Version>1.1.4</Version>
+        <VersionPrefix>1.1.4</VersionPrefix>
         <Authors>Arsène Lapostolet</Authors>
     </PropertyGroup>
 
