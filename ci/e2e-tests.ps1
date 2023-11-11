@@ -5,13 +5,6 @@ $pwd = pwd;
 
 $appStatus = curl -o /dev/null --silent --head --write-out '%{http_code}' http://planificateur-e2e
 
-while ($appStatus -ne "200"){
-    Start-Sleep -Seconds 3;
-    $appStatus = curl -o /dev/null --silent --head --write-out '%{http_code}' http://planificateur-e2e
-}
-
-Start-Sleep -Seconds 15;
-
 docker run `
     --env APP_URL="http://planificateur-e2e/" `
     --env IS_CI="true" `
@@ -20,7 +13,7 @@ docker run `
     -v "${pwd}:/app" `
     -w /app `
     ombrelin/dotnet7-playwright `
-    /bin/bash -c "dotnet build /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj && ~/bin/playwright install-deps && ~/bin/playwright install firefox && dotnet test /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj"
+    /bin/bash -c "dotnet build /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj && ~/bin/playwright install-deps && until [   "$(curl -s -w '%{http_code}' -o /dev/null "http://planificateur-e2e")"   -eq 200 ]; do echo 3;   sleep 1; done && ~/bin/playwright install firefox && dotnet test /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj"
 
 $result = docker inspect planificateur-e2e-tests-exec --format='{{.State.ExitCode}}'
 
