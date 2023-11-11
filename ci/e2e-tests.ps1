@@ -3,6 +3,13 @@ docker compose up -d --build
 cd ..
 $pwd = pwd;
 
+$appStatus = curl -o /dev/null --silent --head --write-out '%{http_code}' http://planificateur-e2e
+
+while ($appStatus -ne "200"){
+    Start-Sleep -Seconds 3;
+    $appStatus = curl -o /dev/null --silent --head --write-out '%{http_code}' http://planificateur-e2e
+}
+
 Start-Sleep -Seconds 15;
 
 docker run `
