@@ -8,7 +8,7 @@ using Planificateur.Web.Json;
 
 namespace Planificateur.ClientSdk.ClientSdk;
 
-public class PlanificateurClient
+public class PlanificateurClient : IPlanificateurClient
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -25,9 +25,12 @@ public class PlanificateurClient
 
     public PlanificateurClient(HttpClient httpClient)
     {
+        ArgumentNullException.ThrowIfNull(httpClient.BaseAddress);
         this.httpClient = httpClient;
     }
 
+
+    public Uri BaseUri => this.httpClient.BaseAddress!;
 
     public async Task<(PollWithoutVotes?, HttpStatusCode)> CreatePoll(CreatePollRequest createPollRequest)
     {
@@ -44,12 +47,12 @@ public class PlanificateurClient
     }
 
 
-    public async Task<(PollWithoutVotes?, HttpStatusCode)> GetPoll(Guid id)
+    public async Task<(PollWithVotes?, HttpStatusCode)> GetPoll(Guid id)
     {
         HttpResponseMessage response = await this.httpClient.GetAsync($"api/polls/{id}");
         try
         {
-            return (await response.Content.ReadFromJsonAsync<PollWithoutVotes>(JsonOptions), response.StatusCode);
+            return (await response.Content.ReadFromJsonAsync<PollWithVotes>(JsonOptions), response.StatusCode);
         }
         catch
         {
