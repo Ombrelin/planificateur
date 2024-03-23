@@ -8,6 +8,10 @@ public class ApplicationUserEntity : IEntity<ApplicationUser>
     public string Username { get; set; }
     public Guid Id { get; set; }
 
+    public ApplicationUserEntity()
+    {
+    }
+
     public ApplicationUserEntity(ApplicationUser applicationUser)
     {
         Id = applicationUser.Id;
