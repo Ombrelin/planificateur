@@ -15,11 +15,11 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
     {
         this.serverAddress = Environment.GetEnvironmentVariable("APP_URL") ??
                              throw new ArgumentException("The APP_URL env variable must be populated");
-        page = playwrightFixture.Page;
+        page = playwrightFixture.Page ?? throw new InvalidOperationException("Could not start Playwirght page");
     }
 
     [Fact]
-    public async Task<Guid> CreatePoll_CreatePoll()
+    public async Task CreatePoll_CreatePoll()
     {
         // Given
         const string name = "Test Poll";
@@ -33,8 +33,7 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>
 
         // Then
         page.Url.Should().StartWith($"{serverAddress}polls/");
-        Guid.TryParse(page.Url.Split("/").Last(), out Guid pollId).Should().BeTrue();
-        return pollId;
+        Guid.TryParse(page.Url.Split("/").Last(), out _).Should().BeTrue();
     }
 
 

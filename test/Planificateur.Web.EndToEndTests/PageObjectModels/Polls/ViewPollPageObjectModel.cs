@@ -33,7 +33,7 @@ public class ViewPollPageObjectModel : PageObjectModel
 
         tableCellsText
             .Where(cellText =>
-                formattedDatetimes.Any(date => cellText.Contains(date.date) && cellText.Contains(date.time)))
+                formattedDatetimes.Any(date => cellText!.Contains(date.date) && cellText.Contains(date.time)))
             .Should()
             .HaveCount(dateTimes.Count);
     }

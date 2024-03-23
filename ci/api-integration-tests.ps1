@@ -23,7 +23,7 @@ docker run `
     -e JWT_SECRET=this-is-a-secret `
     --net planificateur-integration-tests-net `
     --name planificateur-integration-tests-net `
-    ombrelin/dotnet7-node dotnet test /app/test/Planificateur.Web.IntegrationTests/Planificateur.Web.IntegrationTests.csproj
+    ombrelin/dotnet-node:8-18 dotnet test /app/test/Planificateur.Web.IntegrationTests/Planificateur.Web.IntegrationTests.csproj
 
 
 $result = docker inspect planificateur-integration-tests-net --format='{{.State.ExitCode}}'
