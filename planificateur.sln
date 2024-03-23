@@ -12,14 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Web.EndToEndT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.Tests.Shared", "test\Planificateur.Tests.Shared\Planificateur.Tests.Shared.csproj", "{EE70130A-70B7-44FB-987C-1594BEDD7571}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.UI", "src\Planificateur.UI\Planificateur.UI\Planificateur.UI.csproj", "{47E2D981-97B7-4833-9A2B-A8CF5E938F09}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.UI.Android", "src\Planificateur.UI\Planificateur.UI.Android\Planificateur.UI.Android.csproj", "{D040EFAC-74CA-4558-917E-FF9056F6BAE4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.UI.Desktop", "src\Planificateur.UI\Planificateur.UI.Desktop\Planificateur.UI.Desktop.csproj", "{989F828F-0B6A-46BF-9429-34DEB5A5F885}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.UI.ViewModels", "src\Planificateur.UI\Planificateur.UI.ViewModels\Planificateur.UI.ViewModels.csproj", "{2E892A5A-9789-4446-8744-2A4A4F39B144}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planificateur.ClientSdk", "src\Planificateur.ClientSdk\Planificateur.ClientSdk.csproj", "{0078D76F-C261-413C-90AD-653F2007BA0A}"
 EndProject
 Global
