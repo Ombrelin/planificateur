@@ -20,7 +20,7 @@ docker run `
     -e DB_USERNAME=postgres `
     -e DB_PASSWORD=password `
     -e DB_NAME=planificateur `
-    -e JWT_SECRET=this-is-a-secret `
+    -e JWT_SECRET=this-is-a-secret-very-secret-dont-share-to-anyone `
     --net planificateur-integration-tests-net `
     --name planificateur-integration-tests-net `
     ombrelin/dotnet-node:8-18 dotnet test /app/test/Planificateur.Web.IntegrationTests/Planificateur.Web.IntegrationTests.csproj
