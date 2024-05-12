@@ -1,2 +1,2 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0
-RUN dotnet tool install Microsoft.Playwright.CLI --tool-path ~/bin
+FROM mcr.microsoft.com/playwright/dotnet:v1.42.0-jammy
+RUN apt-get update ; apt-get install docker.io -y ;
