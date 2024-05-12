@@ -1,12 +1,25 @@
 # Planificateur
 
-## Introduction
+## Purpose
 
-Simple and lightweight event scheduler : 
+The purpose of Planificateur is to allow groups to schedule events in a streamlined fashion.
 
-- Schedule events
-- Mobile Friendly UI
+I started this project because existing FOSS apps with this purpose had limitations that did not fit my use-case : 
+
+- Usable on mobile
+- Have a ReST API
+- Automatable
+
+## Features
+
+- Schedule events for groups, find the best date for everyone
+- Mobile-friendly, lightweight UI
 - ReST API
+
+## Roadmap
+
+- Cross-platform client app for mobile & desktop
+- Automation capabilities : recurring polls, messaging integration
 
 ## Tech Stack
 
@@ -36,6 +49,7 @@ Tooling :
           - DB_PASSWORD=password
           - DB_PORT=5432
           - DB_USERNAME=postgres
+          - JWT_SECRET=this-is-a-secret-dont-tell-anyone
       image: ombrelin/planificateur
 ```
 
@@ -50,3 +64,11 @@ Requirement :
 cd src/Planificateur.Web
 dotnet run
 ```
+
+# Screenshots
+
+![Creation form](screenshots/create-poll.png)
+
+![Desktop poll UI](screenshots/poll.png)
+
+![Mobile poll UI](screenshots/poll-mobile.png)

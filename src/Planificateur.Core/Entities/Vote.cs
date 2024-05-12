@@ -16,15 +16,15 @@ public class Vote
 
     public List<Availability> Availabilities { get; set; }
 
-    public Vote(Guid id, Guid pollId, string voterName)
+    public Vote(Guid id, Guid pollId, string voterName, List<Availability> availabilities)
     {
         Id = id;
         PollId = pollId;
         VoterName = voterName;
-        Availabilities = new List<Availability>();
+        Availabilities = availabilities;
     }
 
-    public Vote(Guid pollId, string voterName) : this(Guid.NewGuid(), pollId, voterName)
+    public Vote(Guid pollId, string voterName) : this(Guid.NewGuid(), pollId, voterName, new List<Availability>())
     {
     }
 }

@@ -1,0 +1,1 @@
+swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1

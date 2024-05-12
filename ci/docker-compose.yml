@@ -8,10 +8,11 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=planificateur
   planificateur-e2e:
-    container_name: panificateur-e2e
+    container_name: planificateur-e2e
     build:
       dockerfile: src/Planificateur.Web/Dockerfile
       context: ..
+      
     depends_on:
       - postgres
     environment:
@@ -20,5 +21,6 @@ services:
       - DB_PASSWORD=password
       - DB_PORT=5432
       - DB_USERNAME=postgres
+      - JWT_SECRET=this-is-a-secret-dont-tell-anyone
     ports: 
       - 5000:80

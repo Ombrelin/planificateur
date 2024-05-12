@@ -12,14 +12,15 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "applicationUrl": "http://localhost:5251",
+      "applicationUrl": "http://0.0.0.0:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DB_HOST": "localhost",
         "DB_PORT": "5432",
         "DB_USERNAME": "postgres",
         "DB_PASSWORD": "password",
-        "DB_NAME": "planificateur-dev"
+        "DB_NAME": "planificateur-dev",
+        "JWT_SECRET": "this-is-a-secret"
       }
     },
     "https": {

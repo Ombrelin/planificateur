@@ -5,9 +5,16 @@ using Planificateur.Core.Entities;
 namespace Planificateur.Web.Json;
 
 [JsonSerializable(typeof(CreatePollRequest))]
-[JsonSerializable(typeof(Poll))]
+[JsonSerializable(typeof(List<PollWithoutVotes>))]
+[JsonSerializable(typeof(PollWithoutVotes[]))]
+[JsonSerializable(typeof(List<PollWithVotes>))]
+[JsonSerializable(typeof(List<Planificateur.Core.Contracts.Vote>))]
 [JsonSerializable(typeof(object))]
-internal partial class SourceGenerationSerialiser : JsonSerializerContext
+[JsonSerializable(typeof(CreateVoteRequest))]
+[JsonSerializable(typeof(RegisterRequest))]
+[JsonSerializable(typeof(RegisterResponse))]
+[JsonSerializable(typeof(LoginRequest))]
+[JsonSerializable(typeof(LoginResponse))]
+public partial class SourceGenerationSerialiser : JsonSerializerContext
 {
-    
 }

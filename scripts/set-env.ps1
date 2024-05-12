@@ -1,0 +1,6 @@
+$Env:DB_HOST = "localhost"
+$Env:DB_PORT ="5432"
+$Env:DB_USERNAME = "postgres"
+$Env:DB_PASSWORD = "password"
+$Env:DB_NAME = "planificateur"
+$Env:JWT_SECRET = "this-is-a-scecret"

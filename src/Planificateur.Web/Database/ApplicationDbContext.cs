@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Planificateur.Core.Entities;
+using Planificateur.Web.Database.Entities;
 
 namespace Planificateur.Web.Database;
 
@@ -9,13 +9,16 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    public DbSet<Poll> Polls { get; set; }
-    public DbSet<Vote> Votes { get; set; }
+    public DbSet<PollEntity> Polls { get; set; }
+    public DbSet<VoteEntity> Votes { get; set; }
+
+    public DbSet<ApplicationUserEntity> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Poll>(entity =>
+        modelBuilder.Entity<PollEntity>(entity =>
         {
+            entity.ToTable("Polls");
             entity.HasKey(poll => poll.Id);
             entity
                 .Property(poll => poll.Id)
@@ -23,21 +26,34 @@ public class ApplicationDbContext : DbContext
             entity.Property(poll => poll.Name);
             entity.Property(poll => poll.Dates);
             entity.Property(poll => poll.ExpirationDate);
+            entity.Property(poll => poll.AuthorId);
         });
 
-        modelBuilder.Entity<Vote>(entity =>
+        modelBuilder.Entity<VoteEntity>(entity =>
         {
+            entity.ToTable("Votes");
             entity.HasKey(vote => vote.Id);
             entity
                 .Property(vote => vote.Id)
                 .ValueGeneratedNever();
             entity.Property(vote => vote.Availabilities);
             entity
-                .HasOne<Poll>()
+                .HasOne<PollEntity>()
                 .WithMany(poll => poll.Votes)
                 .HasForeignKey(vote => vote.PollId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-    }
 
+        modelBuilder.Entity<ApplicationUserEntity>(entity =>
+            {
+                entity.ToTable("Users");
+                entity.HasKey(user => user.Id);
+                entity
+                    .Property(vote => vote.Id)
+                    .ValueGeneratedNever();
+                entity.Property(vote => vote.Username);
+                entity.Property(vote => vote.Password);
+            }
+        );
+    }
 }

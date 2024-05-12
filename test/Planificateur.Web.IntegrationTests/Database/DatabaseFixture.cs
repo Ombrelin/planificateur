@@ -4,24 +4,31 @@ using Planificateur.Web.Database;
 
 namespace Planificateur.Web.Tests.Database;
 
-public class DatabaseFixture : IAsyncLifetime {
-    public  ApplicationDbContext DbContext { get; }
-
-    public DatabaseFixture()
-    {
-
-        DbContext = BuildNewDbContext();
-    }
+public class DatabaseFixture : IAsyncLifetime
+{
+    public ApplicationDbContext DbContext => BuildNewDbContext();
     
     public static ApplicationDbContext BuildNewDbContext()
     {
+        string? dbPort = Environment.GetEnvironmentVariable("DB_PORT");
+        string? dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+        string? dbUserName = Environment.GetEnvironmentVariable("DB_USERNAME");
+        string? dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+        string? dbName = Environment.GetEnvironmentVariable("DB_NAME");
+
+        foreach (string? parameter in new[] { dbPort, dbHost, dbUserName, dbPassword, dbName })
+        {
+            ArgumentException.ThrowIfNullOrEmpty(parameter);
+        }
+
         var builder = new NpgsqlConnectionStringBuilder
         {
-            Host = Environment.GetEnvironmentVariable("DB_HOST"),
-            Port = int.Parse(Environment.GetEnvironmentVariable("DB_PORT")),
-            Username = Environment.GetEnvironmentVariable("DB_USERNAME"),
-            Password = Environment.GetEnvironmentVariable("DB_PASSWORD"),
-            Database = Environment.GetEnvironmentVariable("DB_NAME")
+            Host = dbHost,
+            Port = int.Parse(dbPort),
+            Username = dbUserName,
+            Password = dbPassword,
+            Database = dbName,
+            IncludeErrorDetail = true
         };
         DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseNpgsql(builder.ToString())

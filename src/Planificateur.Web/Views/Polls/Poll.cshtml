@@ -1,5 +1,6 @@
 @using Planificateur.Core.Entities
-@model Planificateur.Core.Entities.Poll?
+@using Vote = Planificateur.Core.Contracts.Vote
+@model Planificateur.Core.Contracts.PollWithVotes?
 
 @{
     Layout = "Layout";
@@ -19,7 +20,7 @@
 
             <form action="/polls/@Model.Id/votes" method="post">
 
-                <table class="table">
+                <table class="table is-striped">
                     <thead>
                     <tr>
                         <th></th>
@@ -27,7 +28,7 @@
                             <div class="field">
                                 <label class="label">Your Name : </label>
                                 <div class="control">
-                                    <input required class="input" id="voter-name" name="voterName" type="text"/>
+                                    <input onblur="saveVoterName()" required class="input" id="voter-name" name="voterName" type="text"/>
                                 </div>
                             </div>
                         </th>
@@ -41,25 +42,25 @@
                     <tbody>
                     @foreach ((DateTime date, int index) in @Model.Dates.Select((elt, index) => (elt,index)))
                     {
-                        <tr>
-                            <td>@date.ToString("dddd dd/MM/yy")</td>
+                        <tr class="date-row">
+                            <td class="date-cell" data-year="@date.Year" data-month="@date.Month" data-day="@date.Day" data-hour="@date.Hour" data-minute="@date.Minute"></td>
                             <td>
-                                <div class="control">
+                                <div class="control available-radio-button">
                                     <label class="radio">
                                         <input type="radio" required name="availability[@index]" value="Available"/>
-                                        ✅ <span class="vote-legend">Available</span>
+                                        <span class="ignore-dark-theme">✅</span> <span class="vote-legend">Available</span>
                                     </label>
                                 </div>
                                 <div class="control">
                                     <label class="radio">
                                         <input type="radio" required name="availability[@index]" value="Possible"/>
-                                        ❔ <span class="vote-legend">Possible</span>
+                                        <span class="ignore-dark-theme">❔</span> <span class="vote-legend">Possible</span>
                                     </label>
                                 </div>
                                 <div class="control">
                                     <label class="radio">
                                         <input type="radio" required name="availability[@index]" value="NotAvailable"/>
-                                        ❌ <span class="vote-legend">NotAvailable</span>
+                                        <span class="ignore-dark-theme">❌</span> <span class="vote-legend">NotAvailable</span>
                                     </label>
                                 </div>
                             </td>
@@ -70,38 +71,50 @@
                                         switch (vote.Availabilities[index])
                                         {
                                             case Availability.Available:
-                                                <text>✅</text>
+                                                <span class="ignore-dark-theme">✅</span>
                                                 break;
                                             case Availability.Possible:
-                                                <text> ❔
-                                                </text>
+                                                <span class="ignore-dark-theme">
+                                                    ❔
+                                                </span>
                                                 break;
                                             case Availability.NotAvailable:
-                                                <text>❌</text>
+                                                <span class="ignore-dark-theme">❌</span>
                                                 break;
                                         }
 
                                     }
-                                    <span class="vote-legend">@vote.Availabilities[index]</span>
                                 </td>
                             }
 
                         </tr>
                     }
-                    </tbody>
-                    <tfoot>
+
                     <tr>
                         <td></td>
                         <td>
 
-                            <button id="create-vote" class="button is-primary">Add Vote</button>
+                            <button id="create-vote" class="button is-primary ignore-dark-theme">Add Vote</button>
                         </td>
-                        @foreach (Vote vote in @Model.Votes)
+                        @if (@Model.Votes.Any())
                         {
-                            <td></td>
+                            @foreach (Vote vote in @Model.Votes)
+                            {
+                                <td class="delete-vote">
+                                    <button type="button" class="button is-danger ignore-dark-theme" onclick="deleteVote('@Model.Id' ,'@vote.Id')">
+                                        <span class="icon">
+                                            <i class="fas fa-trash "></i>
+                                        </span>
+                                    </button>
+                                </td>
+                            }
                         }
 
                     </tr>
+
+                    </tbody>
+                    <tfoot>
+
                     </tfoot>
                 </table>
             </form>
@@ -115,13 +128,19 @@
                     {
                         <span>No votes yet.</span>
                     }
-                    
+
                     @foreach (DateTime date in @bestDates.dates)
                     {
-                        <li>@date.ToString("dddd dd/MM/yy")</li>
+                        <li class="best-date" data-year="@date.Year" data-month="@date.Month" data-day="@date.Day" data-hour="@date.Hour" data-minute="@date.Minute">@date.ToString("dddd dd/MM/yy")</li>
                     }
                 </ul>
             </div>
         }
     </div>
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", loadVoterName);
+document.addEventListener("DOMContentLoaded", loadLocalDates);
+</script>

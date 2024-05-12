@@ -1,10 +1,12 @@
-bin/
-obj/
+**/bin/
+**/obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
 .idea
 **.sln.DotSettings.user
 .fleet
-**.js**
+**.js
+src/Planificateur.Web/logs
+src/Planificateur.Web/wwwroot/script.js.map
 client-sdk-*

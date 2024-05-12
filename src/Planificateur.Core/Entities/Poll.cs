@@ -1,37 +1,52 @@
 namespace Planificateur.Core.Entities;
 
-public class Poll
+public class Poll: IReadOnlyPollWithoutVotes
 {
     public Guid Id { get; }
     private string name;
-    public string Name    {
+
+    public string Name
+    {
         get => name;
-        set => name = string.IsNullOrEmpty(value) ? throw new ArgumentException("Poll name can't be empty") : value;
+        private set => name = string.IsNullOrEmpty(value)
+            ? throw new ArgumentException("Poll name can't be empty")
+            : value;
+    }
+
+
+    public List<Vote> Votes { get; set; }
+    private DateTime[] dates;
+
+    public DateTime[] Dates
+    {
+        get => dates;
+        private set =>
+            dates = value.Length <= 1 ? throw new ArgumentException("Poll require at least two dates") : value;
     }
 
     public DateTime ExpirationDate { get; set; }
-    public IList<Vote> Votes { get; set; }
 
-    private List<DateTime> dates = new List<DateTime>();
-
-    public List<DateTime> Dates
+    public Poll(string name, IEnumerable<DateTime> dates) : this(
+        Guid.NewGuid(),
+        name,
+        dates
+            .OrderBy(date => date)
+            .ToArray(),
+        DateTime
+            .UtcNow
+            .AddMonths(2),
+        new List<Vote>()
+    )
     {
-        get => dates;
-        set => dates = value.Count is 0 ? throw new ArgumentException("Poll dates can't be empty") : value;
     }
 
-    public Poll(Guid id, string name, List<DateTime> dates)
+    public Poll(Guid id, string name, DateTime[] dates, DateTime expirationDate, List<Vote> votes)
     {
-        Name = name;
         Id = id;
-        ExpirationDate = DateTime.UtcNow.AddMonths(2);
-        Votes = new List<Vote>();
+        Name = name;
         Dates = dates;
-    }
-
-    public Poll(string name, List<DateTime> dates) : this(Guid.NewGuid(), name, dates)
-    {
-        
+        ExpirationDate = expirationDate;
+        Votes = votes;
     }
 
     public (IReadOnlyCollection<DateTime> dates, decimal? score) BestDates
@@ -42,7 +57,7 @@ public class Poll
             {
                 return (new List<DateTime>(), null);
             }
-            
+
             var scoredDates = ScoreDates();
             decimal bestScore = GetBestScore(scoredDates);
 
@@ -52,7 +67,10 @@ public class Poll
         }
     }
 
-    private static DateTime[] ExtractBestDates(IEnumerable<(DateTime date, decimal score)> scoredDates, decimal bestScore)
+    public Guid? AuthorId { get; set; }
+
+    private static DateTime[] ExtractBestDates(IEnumerable<(DateTime date, decimal score)> scoredDates,
+        decimal bestScore)
     {
         return scoredDates
             .Where(scoreDate => scoreDate.score == bestScore)
@@ -68,7 +86,9 @@ public class Poll
     {
         var scoredDates = Dates
             .Select((date, index) =>
-                (date, score: Votes.Select(vote => vote.Availabilities[index]).Select(availability => (decimal)availability).Sum() / 2))
+                (date,
+                    score: Votes.Select(vote => vote.Availabilities[index])
+                        .Select(availability => (decimal)availability).Sum() / 2))
             .ToList();
         return scoredDates;
     }
