@@ -12,21 +12,14 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>, IClassFixtur
     private readonly IPage page;
     private readonly string serverAddress;
     private readonly ContainersFixture containersFixture;
-    private ITestOutputHelper outputHelper;
+    private readonly ITestOutputHelper outputHelper;
 
     public PlanificateurTests(PlaywrightFixture playwrightFixture, ContainersFixture containersFixture, ITestOutputHelper outputHelper)
     {
         this.containersFixture = containersFixture;
         this.outputHelper = outputHelper;
-        bool isContinuousIntegration = bool.Parse(Environment.GetEnvironmentVariable("IS_CI") ?? bool.FalseString);
-        if (isContinuousIntegration)
-        {
-            this.serverAddress = "http://application:8080/";
-        }
-        else
-        {
-            this.serverAddress = $"{containersFixture.ApplicationContainer!.Hostname}:5000/";
-        }
+        var isContinuousIntegration = bool.Parse(Environment.GetEnvironmentVariable("IS_CI") ?? bool.FalseString);
+        this.serverAddress = isContinuousIntegration ? "http://application:8080/" : $"{containersFixture.ApplicationContainer!.Hostname}:5000/";
         
         page = playwrightFixture.Page ?? throw new InvalidOperationException("Could not start Playwirght page");
     }
@@ -82,7 +75,6 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>, IClassFixtur
         await createPageObjectModel.SubmitPoll();
 
         // Then
-        outputHelper.WriteLine(page.Url);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
         await viewPollPageModel.VerifyTitleAndDates(name, dateTimes);
@@ -96,7 +88,6 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>, IClassFixtur
         var dateTime = new DateTime(2022, 12, 15, 12, 12, 12);
         var dateTimes = new[] { dateTime, dateTime.AddDays(2), dateTime.AddDays(3) };
         await CreatePoll(name, dateTimes);
-        outputHelper.WriteLine(page.Url);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
 
@@ -116,7 +107,6 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>, IClassFixtur
         var dateTimes = new[] { DateTime.Today, DateTime.Today.AddDays(2), DateTime.Today.AddDays(3) };
 
         await CreatePoll(name, dateTimes);
-        outputHelper.WriteLine(page.Url);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var vote = new Vote
         (
@@ -150,7 +140,6 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>, IClassFixtur
         var dateTimes = new[] { DateTime.Today.AddDays(1), DateTime.Today.AddDays(3), DateTime.Today.AddDays(4) };
 
         await CreatePoll(name, dateTimes);
-        outputHelper.WriteLine(page.Url);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var viewPollPageModel = new ViewPollPageObjectModel(page, serverAddress, pollId);
 
@@ -170,7 +159,6 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>, IClassFixtur
         var dateTimes = new[] { DateTime.Today, DateTime.Today.AddDays(2), DateTime.Today.AddDays(3) };
 
         await CreatePoll(name, dateTimes);
-        outputHelper.WriteLine(page.Url);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var vote = new Vote
         (
@@ -196,14 +184,13 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>, IClassFixtur
 
     [Fact]
     public async Task MultipleVotes_ShowsBestDate()
-    {
+    {   
         // Given
         const string name = "Test Poll";
         var dateTime = new DateTime(2022, 12, 15, 12, 12, 12);
         var dateTimes = new[] { dateTime, dateTime.AddDays(2), dateTime.AddDays(3) };
 
         await CreatePoll(name, dateTimes);
-        outputHelper.WriteLine(page.Url);
         Guid pollId = Guid.Parse(page.Url.Split("/").Last());
         var vote1 = new Vote
         (
@@ -255,7 +242,6 @@ public class PlanificateurTests : IClassFixture<PlaywrightFixture>, IClassFixtur
         if (containersFixture.ApplicationContainer is not null)
         {
             var (stdOut, stdErr) = await containersFixture.ApplicationContainer.GetLogsAsync();
-            outputHelper.WriteLine(stdOut);
             outputHelper.WriteLine(stdErr);
         }
         
