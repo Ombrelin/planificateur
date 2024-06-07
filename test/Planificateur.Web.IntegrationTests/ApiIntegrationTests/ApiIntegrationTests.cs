@@ -11,7 +11,7 @@ using Planificateur.Web.Tests.Database;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
-public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>, IClassFixture<DatabaseFixture>
+public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
 {
     protected PlanificateurClient Client;
     protected ApplicationDbContext DbContext;
