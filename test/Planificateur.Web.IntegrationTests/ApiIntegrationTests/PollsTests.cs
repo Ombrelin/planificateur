@@ -255,5 +255,8 @@ public class PollsTests : ApiIntegrationTests
         response
             .Should()
             .AllSatisfy(poll => userPollsIds.Should().Contain(poll.Id.ToString()));
+        response
+            .Should()
+            .AllSatisfy(poll => poll.Name.Should().Be("Test Poll"));
     }
 }
