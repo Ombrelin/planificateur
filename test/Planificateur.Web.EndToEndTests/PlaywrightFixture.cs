@@ -6,6 +6,7 @@ public class PlaywrightFixture : IAsyncLifetime
 {
     private IPlaywright? playwright;
     private IBrowser? browser;
+    private IBrowserContext? browserContext;
 
     public IPage? Page { get; private set; }
 
@@ -17,23 +18,35 @@ public class PlaywrightFixture : IAsyncLifetime
         BrowserTypeLaunchOptions browserTypeLaunchOptions = isContinuousIntegration
             ? new BrowserTypeLaunchOptions
             {
-                Headless = true
+                Headless = true,
+                Timeout = 5000
             }
             : new BrowserTypeLaunchOptions
             {
                 Headless = false,
-                SlowMo = 500
+                SlowMo = 500,
+                Timeout = 5000
             };
-        browser = await playwright.Firefox.LaunchAsync(browserTypeLaunchOptions);
-        Page = await browser.NewPageAsync();
+        browser = await playwright.Chromium.LaunchAsync(browserTypeLaunchOptions);
+        browserContext = await browser.NewContextAsync(new()
+        {
+        //    RecordVideoDir = "/videos",
+        //    RecordVideoSize = new RecordVideoSize() { Width = 640, Height = 480 }
+        });
+        Page = await browserContext.NewPageAsync();
     }
 
     public async Task DisposeAsync()
     {
+        if (browserContext is not null)
+        {
+            await browserContext.CloseAsync();
+        }
+        
         if (browser is not null)
         {
             await browser.DisposeAsync();   
-        }
+        }   
 
         playwright?.Dispose();
     }

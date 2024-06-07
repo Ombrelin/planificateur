@@ -9,3 +9,4 @@ riderModule.iml
 **.js
 src/Planificateur.Web/logs
 src/Planificateur.Web/wwwroot/script.js.map
+client-sdk-*

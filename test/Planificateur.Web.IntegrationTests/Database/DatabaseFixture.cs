@@ -1,47 +1,56 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Planificateur.Web.Database;
+using Testcontainers.PostgreSql;
 
 namespace Planificateur.Web.Tests.Database;
 
 public class DatabaseFixture : IAsyncLifetime
 {
+    private static PostgreSqlContainer? _postgresContainer;
     public ApplicationDbContext DbContext => BuildNewDbContext();
     
     public static ApplicationDbContext BuildNewDbContext()
     {
-        string? dbPort = Environment.GetEnvironmentVariable("DB_PORT");
-        string? dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-        string? dbUserName = Environment.GetEnvironmentVariable("DB_USERNAME");
-        string? dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-        string? dbName = Environment.GetEnvironmentVariable("DB_NAME");
-
-        foreach (string? parameter in new[] { dbPort, dbHost, dbUserName, dbPassword, dbName })
-        {
-            ArgumentException.ThrowIfNullOrEmpty(parameter);
-        }
-
-        var builder = new NpgsqlConnectionStringBuilder
-        {
-            Host = dbHost,
-            Port = int.Parse(dbPort),
-            Username = dbUserName,
-            Password = dbPassword,
-            Database = dbName,
-            IncludeErrorDetail = true
-        };
         DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseNpgsql(builder.ToString())
+            .UseNpgsql(_postgresContainer.GetConnectionString())
             .Options;
 
         return new ApplicationDbContext(options);
     }
 
-    public async Task InitializeAsync() => await DbContext.Database.MigrateAsync();
+    public async Task InitializeAsync()
+    {
+        bool isContinuousIntegration = bool.Parse(Environment.GetEnvironmentVariable("IS_CI") ?? bool.FalseString);
+        var databaseAlias = "database";
+        const string postgresUsername = "user";
+        const string postgresPassword = "password";
+        const string postgresDatabase = "planificateur";
+        const int postgresPort = 5432;
+        var postgreSqlContainerBuilder = new PostgreSqlBuilder()
+            .WithPortBinding(postgresPort, postgresPort)
+            .WithUsername(postgresUsername)
+            .WithPassword(postgresPassword)
+            .WithDatabase(postgresDatabase)
+            .WithNetworkAliases(databaseAlias);
+
+        if (isContinuousIntegration)
+        {
+            postgreSqlContainerBuilder = postgreSqlContainerBuilder
+                .WithNetwork("network");
+        }
+
+        _postgresContainer = postgreSqlContainerBuilder.Build();
+        await _postgresContainer.StartAsync();
+        await DbContext.Database.MigrateAsync();
+    }
 
     public async Task DisposeAsync()
     {
-        await DbContext.Database.EnsureDeletedAsync();
-        await DbContext.DisposeAsync();
+        if (_postgresContainer is not null)
+        {
+            await _postgresContainer.DisposeAsync();
+        }
+        
     }
 }

@@ -4,7 +4,6 @@ cd ..
 $pwd = pwd;
 
 docker run `
-    --env APP_URL="http://planificateur-e2e/" `
     --env IS_CI="true" `
     --net ci_default `
     --name planificateur-e2e-tests-exec `
