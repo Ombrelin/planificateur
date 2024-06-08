@@ -1,56 +1,36 @@
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using Planificateur.Web.Database;
 using Testcontainers.PostgreSql;
 
 namespace Planificateur.Web.Tests.Database;
 
 public class DatabaseFixture : IAsyncLifetime
 {
-    private static PostgreSqlContainer? _postgresContainer;
-    public ApplicationDbContext DbContext => BuildNewDbContext();
+    private readonly static string DatabaseName = "planificateur-integration-tests";
+    private readonly static string DatabaseUsername = "test";
+    private readonly static string DatabasePassword = "test";
     
-    public static ApplicationDbContext BuildNewDbContext()
-    {
-        DbContextOptions<ApplicationDbContext> options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseNpgsql(_postgresContainer.GetConnectionString())
-            .Options;
-
-        return new ApplicationDbContext(options);
-    }
-
+    public PostgreSqlContainer Database { get; } = new PostgreSqlBuilder()
+        .WithDatabase(DatabaseName)
+        .WithUsername(DatabaseUsername)
+        .WithPassword(DatabasePassword)
+        .Build();
+    
     public async Task InitializeAsync()
     {
-        bool isContinuousIntegration = bool.Parse(Environment.GetEnvironmentVariable("IS_CI") ?? bool.FalseString);
-        var databaseAlias = "database";
-        const string postgresUsername = "user";
-        const string postgresPassword = "password";
-        const string postgresDatabase = "planificateur";
-        const int postgresPort = 5432;
-        var postgreSqlContainerBuilder = new PostgreSqlBuilder()
-            .WithPortBinding(postgresPort, postgresPort)
-            .WithUsername(postgresUsername)
-            .WithPassword(postgresPassword)
-            .WithDatabase(postgresDatabase)
-            .WithNetworkAliases(databaseAlias);
-
-        if (isContinuousIntegration)
-        {
-            postgreSqlContainerBuilder = postgreSqlContainerBuilder
-                .WithNetwork("network");
-        }
-
-        _postgresContainer = postgreSqlContainerBuilder.Build();
-        await _postgresContainer.StartAsync();
-        await DbContext.Database.MigrateAsync();
+        await Database.StartAsync();
+        Environment.SetEnvironmentVariable("DB_PORT", Database.GetMappedPublicPort(PostgreSqlBuilder.PostgreSqlPort).ToString());
+        Environment.SetEnvironmentVariable("DB_HOST", Database.Hostname);
+        Environment.SetEnvironmentVariable("DB_USERNAME", DatabaseUsername);
+        Environment.SetEnvironmentVariable("DB_PASSWORD", DatabasePassword);
+        Environment.SetEnvironmentVariable("DB_NAME", DatabaseName);
     }
 
     public async Task DisposeAsync()
     {
-        if (_postgresContainer is not null)
-        {
-            await _postgresContainer.DisposeAsync();
-        }
-        
+        Environment.SetEnvironmentVariable("DB_PORT", string.Empty);
+        Environment.SetEnvironmentVariable("DB_HOST", string.Empty);
+        Environment.SetEnvironmentVariable("DB_USERNAME", string.Empty);
+        Environment.SetEnvironmentVariable("DB_PASSWORD", string.Empty);
+        Environment.SetEnvironmentVariable("DB_NAME", string.Empty);
+        await Database.DisposeAsync();
     }
 }

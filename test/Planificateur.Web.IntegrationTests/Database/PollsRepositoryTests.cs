@@ -10,11 +10,17 @@ namespace Planificateur.Web.Tests.Database;
 [Collection("Database Tests")]
 public class PollsRepositoryTests : DatabaseTests
 {
-    private readonly PollsRepository repository;
+    private PollsRepository repository = null!;
 
-    public PollsRepositoryTests(DatabaseFixture database) : base(database.DbContext)
+    public PollsRepositoryTests(DatabaseFixture databaseFixture) : base(databaseFixture)
     {
-        repository = new PollsRepository(dbContext);
+        
+    }
+
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+        repository = new PollsRepository(DbContext);
     }
 
     [Fact]
@@ -35,7 +41,7 @@ public class PollsRepositoryTests : DatabaseTests
         await repository.Insert(poll);
 
         // Then
-        PollEntity pollInDb = await this.dbContext.Polls.FirstAsync(element => element.Id == poll.Id);
+        PollEntity pollInDb = await this.DbContext.Polls.FirstAsync(element => element.Id == poll.Id);
         pollInDb.Dates.Should().BeEquivalentTo(poll.Dates);
         pollInDb.ExpirationDate.Should().Be(poll.ExpirationDate);
         pollInDb.Name.Should().Be(poll.Name);
@@ -61,7 +67,7 @@ public class PollsRepositoryTests : DatabaseTests
         await repository.Insert(poll);
 
         // Then
-        PollEntity pollInDb = await this.dbContext
+        PollEntity pollInDb = await this.DbContext
             .Polls
             .FirstAsync(element => element.Id == poll.Id);
         pollInDb.Dates.Should().BeEquivalentTo(poll.Dates);
@@ -88,8 +94,8 @@ public class PollsRepositoryTests : DatabaseTests
         var vote = new Vote(poll.Id, "Test Voter Name");
         poll.Votes = new List<Vote> { vote };
 
-        await dbContext.Polls.AddAsync(new PollEntity(poll));
-        await dbContext.SaveChangesAsync();
+        await DbContext.Polls.AddAsync(new PollEntity(poll));
+        await DbContext.SaveChangesAsync();
 
         // When
         Poll? result = await repository.Get(poll.Id);
@@ -122,10 +128,10 @@ public class PollsRepositoryTests : DatabaseTests
             new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(2) }
         ) { AuthorId = authorId };
 
-        await dbContext.Polls.AddAsync(new PollEntity(pollFromAuthor));
-        await dbContext.Polls.AddAsync(new PollEntity(pollFromOtherAuthor));
-        await dbContext.Polls.AddAsync(new PollEntity(otherPollFromAuthor));
-        await dbContext.SaveChangesAsync();
+        await DbContext.Polls.AddAsync(new PollEntity(pollFromAuthor));
+        await DbContext.Polls.AddAsync(new PollEntity(pollFromOtherAuthor));
+        await DbContext.Polls.AddAsync(new PollEntity(otherPollFromAuthor));
+        await DbContext.SaveChangesAsync();
 
         // When
         var result = (await repository.GetPollsByAuthorId(authorId)).ToList();
@@ -153,8 +159,8 @@ public class PollsRepositoryTests : DatabaseTests
         {
             ExpirationDate = DateTime.UtcNow.AddDays(10)
         };
-        await dbContext.Polls.AddAsync(new PollEntity(poll));
-        await dbContext.SaveChangesAsync();
+        await DbContext.Polls.AddAsync(new PollEntity(poll));
+        await DbContext.SaveChangesAsync();
 
         // When
         Poll? result = await repository.Get(poll.Id);

@@ -11,11 +11,17 @@ namespace Planificateur.Web.Tests.Database;
 [Collection("Database Tests")]
 public class VotesRepositoryTests : DatabaseTests
 {
-    private readonly VotesRepository repository;
+    private VotesRepository repository;
 
-    public VotesRepositoryTests(DatabaseFixture database): base(database.DbContext)
+    public VotesRepositoryTests(DatabaseFixture databaseFixture): base(databaseFixture)
     {
-        repository = new VotesRepository(dbContext);
+        
+    }
+
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+        repository = new VotesRepository(DbContext);
     }
 
     [Fact]
@@ -34,17 +40,17 @@ public class VotesRepositoryTests : DatabaseTests
         poll.Votes = new List<Vote> { vote };
 
         var pollEntity = new PollEntity(poll);
-        await dbContext.AddAsync(pollEntity);
-        await dbContext.SaveChangesAsync();
-        dbContext.ChangeTracker.Clear();
+        await DbContext.AddAsync(pollEntity);
+        await DbContext.SaveChangesAsync();
+        DbContext.ChangeTracker.Clear();
 
         // When
         await repository.Delete(vote.Id);
         
         // Then
-        VoteEntity? voteInDb = await dbContext.Votes.FirstOrDefaultAsync(record => record.Id == vote.Id);
+        VoteEntity? voteInDb = await DbContext.Votes.FirstOrDefaultAsync(record => record.Id == vote.Id);
         voteInDb.Should().BeNull();
-        PollEntity? pollInDb = await dbContext
+        PollEntity? pollInDb = await DbContext
             .Polls
             .Include(p => p.Votes)
             .FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
@@ -74,8 +80,8 @@ public class VotesRepositoryTests : DatabaseTests
             ExpirationDate = DateTime.UtcNow.AddDays(10)
         };
 
-        await dbContext.Polls.AddAsync(new PollEntity(poll));
-        await dbContext.SaveChangesAsync();
+        await DbContext.Polls.AddAsync(new PollEntity(poll));
+        await DbContext.SaveChangesAsync();
 
         var vote = new Vote(poll.Id, "Test Voter Name");
 
@@ -83,7 +89,7 @@ public class VotesRepositoryTests : DatabaseTests
         await repository.Save(vote);
 
         // Then
-        PollEntity? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
+        PollEntity? pollInDb = await DbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
         Assert.NotNull(pollInDb);
         VoteEntity voteInDb = Assert.Single(pollInDb.Votes);
         voteInDb.Id.Should().Be(vote.Id);
@@ -120,8 +126,8 @@ public class VotesRepositoryTests : DatabaseTests
 
         poll.Votes = new List<Vote> { vote };
 
-        await dbContext.Polls.AddAsync(new PollEntity(poll));
-        await dbContext.SaveChangesAsync();
+        await DbContext.Polls.AddAsync(new PollEntity(poll));
+        await DbContext.SaveChangesAsync();
 
         var updatedVotes = new Vote
         (
@@ -138,7 +144,7 @@ public class VotesRepositoryTests : DatabaseTests
         await repository.Save(updatedVotes);
 
         // Then
-        PollEntity? pollInDb = await dbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
+        PollEntity? pollInDb = await DbContext.Polls.FirstOrDefaultAsync(pollInDb => pollInDb.Id == poll.Id);
         Assert.NotNull(pollInDb);
         VoteEntity voteInDb = Assert.Single(pollInDb.Votes);
         voteInDb.Id.Should().Be(vote.Id);

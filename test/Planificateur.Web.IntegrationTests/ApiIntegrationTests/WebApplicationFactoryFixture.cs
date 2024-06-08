@@ -1,19 +1,23 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Planificateur.Web.Tests.Database;
+using Testcontainers.PostgreSql;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
-public class WebApplicationFactoryFixture : IAsyncLifetime
+public class WebApplicationFactoryFixture : IDisposable
 {
-    public WebApplicationFactory<Startup> WebApplicationFactory { get; }
-    
-    public Task InitializeAsync()
+    public DatabaseFixture DatabaseFixture { get; }
+    public WebApplicationFactory<Startup>? WebApplicationFactory { get; private set; }
+
+    public WebApplicationFactoryFixture(DatabaseFixture databaseFixture)
     {
-        throw new NotImplemented
-        Exception();
+        this.DatabaseFixture = databaseFixture;
+        Environment.SetEnvironmentVariable("JWT_SECRET", "this is a secret, please don't tell anyone about it");
+        WebApplicationFactory = new WebApplicationFactory<Startup>();
     }
 
-    public Task DisposeAsync()
+    public void Dispose()
     {
-        throw new NotImplementedException();
+        Environment.SetEnvironmentVariable("JWT_SECRET", string.Empty);
     }
 }

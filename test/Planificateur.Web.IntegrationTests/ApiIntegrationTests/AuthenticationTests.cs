@@ -13,9 +13,7 @@ namespace Planificateur.Web.Tests.ApiIntegrationTests;
 [Collection("Database Tests")]
 public class AuthenticationTests : ApiIntegrationTests
 {
-    public AuthenticationTests(WebApplicationFactory<Startup> webApplicationFactory,
-        DatabaseFixture databaseFixture) : base(
-        webApplicationFactory, databaseFixture)
+    public AuthenticationTests(WebApplicationFactoryFixture webApplicationFactory) : base(webApplicationFactory)
     {
     }
 

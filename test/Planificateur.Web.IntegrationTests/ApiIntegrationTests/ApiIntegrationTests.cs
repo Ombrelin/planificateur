@@ -11,24 +11,38 @@ using Planificateur.Web.Tests.Database;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
-public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
+public class ApiIntegrationTests : IClassFixture<WebApplicationFactoryFixture>, IAsyncLifetime
 {
+    private readonly WebApplicationFactoryFixture webApplicationFactory;
     protected PlanificateurClient Client;
-    protected ApplicationDbContext DbContext;
+    protected ApplicationDbContext DbContext = null!;
     protected DataFactory DataFactory = new();
+    private readonly TestDatabaseContextFactory databaseContextFactory = new();
 
+    private static object userCountLock = new();
     private static int UserCount = 0;
 
-    public ApiIntegrationTests(WebApplicationFactory<Startup> webApplicationFactory, DatabaseFixture databaseFixture)
+    public ApiIntegrationTests(WebApplicationFactoryFixture webApplicationFactory)
     {
-        Client = new PlanificateurClient(webApplicationFactory.CreateClient());
-        DbContext = databaseFixture.DbContext;
+        this.webApplicationFactory = webApplicationFactory;
+        Client = new PlanificateurClient(webApplicationFactory.WebApplicationFactory!.CreateClient());
     }
 
+    public async Task InitializeAsync()
+    {
+        DbContext = await databaseContextFactory
+            .BuildNewDbContext(webApplicationFactory.DatabaseFixture.Database.GetConnectionString());
+    }
+    
     public async Task<RegisterResponse> RegisterNewUser()
     {
+        lock (userCountLock)
+        {
+            UserCount++;
+        }
+        
         var request = new RegisterRequest(
-            $"{DataFactory.Username}-{++UserCount}",
+            $"{DataFactory.Username}-{UserCount}",
             DataFactory.Password
         );
         var (response, statusCode) = await Client.Register(request);
@@ -50,4 +64,8 @@ public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
         Assert.Equal(HttpStatusCode.OK, statusCode);
         return response;
     }
+
+
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
