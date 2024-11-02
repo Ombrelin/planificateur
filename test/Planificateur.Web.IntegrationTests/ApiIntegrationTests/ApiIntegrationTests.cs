@@ -46,8 +46,8 @@ public class ApiIntegrationTests : IClassFixture<WebApplicationFactoryFixture>, 
             DataFactory.Password
         );
         var (response, statusCode) = await Client.Register(request);
-        Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.Created, statusCode);
+        Assert.NotNull(response);
         
         return response;
     }
