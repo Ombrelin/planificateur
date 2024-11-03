@@ -25,7 +25,7 @@ I started this project because existing FOSS apps with this purpose had limitati
 
 Code : 
 
-- C# 11 & .NET 7
+- C# 12 & .NET 8
 - Typescript
 - ASP .NET Core & ASP .NET Core MVC
 - Entity Framwork Core
@@ -57,7 +57,7 @@ Tooling :
 
 Requirement : 
 
-- .NET 7 SDK
+- .NET 8 SDK
 - Node JS
 
 ```bash
