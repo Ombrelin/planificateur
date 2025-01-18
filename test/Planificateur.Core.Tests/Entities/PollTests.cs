@@ -29,17 +29,22 @@ public class PollTests
     public void NewPoll_EmptyDates_Throws()
     {
         // When
-        var acts = new[]
-        {
-            () => new Poll("Test Name", Array.Empty<DateTime>()),
-            () => new Poll("Test Name", new[] { DateTime.UtcNow }),
-        };
+        var act = () => new Poll("Test Name", Array.Empty<DateTime>());
+
 
         // Then
-        foreach (var act in acts)
-        {
-            act.Should().Throw<ArgumentException>();
-        }
+        act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void NewPoll_OneDate_CreatesPoll()
+    {
+        // When
+        var poll = new Poll("Test Name", new[] { new DateTime(2025, 1, 18) });
+
+        // Then
+        poll.Id.Should().NotBeEmpty();
+        poll.Dates.Single().Should().Be(new DateTime(2025, 1, 18));
     }
 
     [Fact]

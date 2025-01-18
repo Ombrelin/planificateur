@@ -45,9 +45,8 @@ public class CreatePageObjectModel : PageObjectModel
         await Page.ClickAsync("#create");
     }
 
-    public async Task CheckDateExistInForm(List<DateTime> dates, TimeOnly? time = null)
+    public async Task CheckDateExistInForm(List<DateTime> dates, TimeOnly time)
     {
-        TimeOnly rangeTime = time ?? TimeOnly.FromTimeSpan(TimeSpan.FromHours(12));
         var inputs = (await Page.QuerySelectorAllAsync("""input[type="datetime-local"][name="dates[]"]""")).ToList();
         while (inputs.Count < dates.Count)
         {
@@ -62,12 +61,12 @@ public class CreatePageObjectModel : PageObjectModel
             string inputValue = await input.InputValueAsync();
 
             Assert.Contains(
-                $"{dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T{rangeTime.ToString("HH:mm")}",
+                $"{dates[index].ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T{time.ToString("HH:mm")}",
                 inputValue);
         }
     }
 
-    public async Task AddDateRange(DateTime startDate, DateTime endDate, TimeOnly? time = null)
+    public async Task AddDateRange(DateOnly startDate, DateOnly endDate, TimeOnly? time = null)
     {
         TimeOnly rangeTime = time ?? TimeOnly.FromTimeSpan(TimeSpan.FromHours(12));
 

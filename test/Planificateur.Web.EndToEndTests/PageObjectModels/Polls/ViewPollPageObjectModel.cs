@@ -1,3 +1,4 @@
+using System.Globalization;
 using FluentAssertions;
 using Microsoft.Playwright;
 using Planificateur.Core.Entities;
@@ -7,6 +8,7 @@ namespace Planificateur.Web.EndToEndTests.PageObjectModels.Polls;
 
 public class ViewPollPageObjectModel : PageObjectModel
 {
+    private static readonly CultureInfo CultureUS = CultureInfo.GetCultureInfo("en-US");
     private readonly Guid pollId;
 
     public ViewPollPageObjectModel(IPage page, string baseAppUrl, Guid pollId) : base(page, baseAppUrl)
@@ -24,7 +26,8 @@ public class ViewPollPageObjectModel : PageObjectModel
         title.Should().Be(pollName);
 
         var formattedDatetimes = dateTimes
-            .Select(dateTime => (date: dateTime.ToString("dddd, MM/d/yyyy"), time: dateTime.ToString("hh:mm")))
+            .Select(dateTime => (date: dateTime.ToString("dddd, MM/d/yyyy", CultureUS),
+                time: dateTime.ToString("HH:mm", CultureUS)))
             .ToList();
 
         var tableCells = await Page.QuerySelectorAllAsync("tbody>tr>td.date-cell");
@@ -86,7 +89,7 @@ public class ViewPollPageObjectModel : PageObjectModel
         foreach ((IElementHandle listElement, int index) in bestDates)
         {
             var text = await listElement.TextContentAsync();
-            text.Should().Be(dateTimes[index].ToString("dddd, MM/dd/yyyy hh:mm"));
+            text.Should().Be(dateTimes[index].ToString("dddd, MM/dd/yyyy HH:mm", CultureUS));
         }
     }
 

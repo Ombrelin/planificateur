@@ -21,7 +21,7 @@ public class Poll: IReadOnlyPollWithoutVotes
     {
         get => dates;
         private set =>
-            dates = value.Length <= 1 ? throw new ArgumentException("Poll require at least two dates") : value;
+            dates = value.Length <= 0 ? throw new ArgumentException("Poll require at least one dates") : value;
     }
 
     public DateTime ExpirationDate { get; set; }

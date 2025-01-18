@@ -30,6 +30,7 @@ public class PlaywrightFixture : IAsyncLifetime
         browser = await playwright.Chromium.LaunchAsync(browserTypeLaunchOptions);
         browserContext = await browser.NewContextAsync(new()
         {
+            Locale = "en-US",
         //    RecordVideoDir = "/videos",
         //    RecordVideoSize = new RecordVideoSize() { Width = 640, Height = 480 }
         });
