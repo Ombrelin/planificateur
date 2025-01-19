@@ -6,7 +6,7 @@ docker run \
     --name planificateur-e2e-tests-runner \
     -v "$(pwd):/app" \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    mcr.microsoft.com/playwright/dotnet:v1.42.0-jammy \
+    mcr.microsoft.com/playwright/dotnet:v1.49.0-jammy \
     /bin/bash -c "dotnet test /app/test/Planificateur.Web.EndToEndTests/Planificateur.Web.EndToEndTests.csproj"
     
 result=$(sudo docker inspect planificateur-e2e-tests-runner --format='{{.State.ExitCode}}')
