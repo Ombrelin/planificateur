@@ -11,6 +11,7 @@ namespace Planificateur.Core;
 
 public class AuthenticationApplication
 {
+    
     private readonly IApplicationUsersRepository repository;
     private readonly string jwtSecret;
 

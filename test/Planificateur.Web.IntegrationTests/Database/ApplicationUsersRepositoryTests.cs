@@ -9,16 +9,20 @@ using Planificateur.Web.Database.Repositories;
 namespace Planificateur.Web.Tests.Database;
 
 [Collection("Database Tests")]
-public class ApplicationUsersRepositoryTests
+public class ApplicationUsersRepositoryTests : DatabaseTests
 {
-    private readonly ApplicationUsersRepository repository;
-    private readonly ApplicationDbContext dbContext;
+
+    private ApplicationUsersRepository applicationUsersRepository = null!;
     private readonly DataFactory dataFactory = new();
 
-    public ApplicationUsersRepositoryTests(DatabaseFixture database)
+    public ApplicationUsersRepositoryTests(DatabaseFixture databaseFixture) : base(databaseFixture)
     {
-        dbContext = database.DbContext;
-        repository = new ApplicationUsersRepository(dbContext);
+    }
+
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+        applicationUsersRepository = new ApplicationUsersRepository(DbContext);
     }
 
     [Fact]
@@ -28,10 +32,10 @@ public class ApplicationUsersRepositoryTests
         ApplicationUser user = dataFactory.BuildTestUser();
 
         // When
-        await repository.Insert(user);
+        await applicationUsersRepository.Insert(user);
 
         // Then
-        ApplicationUserEntity userInDb = await dbContext.Users.FirstAsync(record => record.Id == user.Id);
+        ApplicationUserEntity userInDb = await DbContext.Users.FirstAsync(record => record.Id == user.Id);
         userInDb.Username.Should().Be(userInDb.Username);
         userInDb.Password.Should().NotBeEmpty();
     }
@@ -41,11 +45,11 @@ public class ApplicationUsersRepositoryTests
     {
         // Given
         ApplicationUser user = dataFactory.BuildTestUser();
-        await dbContext.Users.AddAsync(new ApplicationUserEntity(user));
-        await dbContext.SaveChangesAsync();
+        await DbContext.Users.AddAsync(new ApplicationUserEntity(user));
+        await DbContext.SaveChangesAsync();
 
         // When
-        ApplicationUser? result = await repository.FindByUsername(user.Username);
+        ApplicationUser? result = await applicationUsersRepository.FindByUsername(user.Username);
 
         // Then
         Assert.NotNull(result);
@@ -59,13 +63,15 @@ public class ApplicationUsersRepositoryTests
     {
         // Given
         ApplicationUser user = dataFactory.BuildTestUser();
-        await dbContext.Users.AddAsync(new ApplicationUserEntity(user));
-        await dbContext.SaveChangesAsync();
+        await DbContext.Users.AddAsync(new ApplicationUserEntity(user));
+        await DbContext.SaveChangesAsync();
 
         // When
-        ApplicationUser? result = await repository.FindByUsername("non existing username");
+        ApplicationUser? result = await applicationUsersRepository.FindByUsername("non existing username");
 
         // Then
         Assert.Null(result);
     }
+
+
 }

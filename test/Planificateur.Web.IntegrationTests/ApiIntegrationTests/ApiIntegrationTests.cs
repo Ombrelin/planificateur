@@ -11,43 +11,54 @@ using Planificateur.Web.Tests.Database;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
-public class ApiIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
+public abstract class ApiIntegrationTests : IClassFixture<WebApplicationFactoryFixture>, IAsyncLifetime
 {
-    protected PlanificateurClient Client;
-    protected ApplicationDbContext DbContext;
-    protected DataFactory DataFactory = new();
+    private readonly WebApplicationFactoryFixture webApplicationFactory;
+    protected readonly PlanificateurClient Client;
+    protected ApplicationDbContext DbContext = null!;
+    protected readonly DataFactory DataFactory = new();
+    private readonly TestDatabaseContextFactory databaseContextFactory = new();
 
-    private static int UserCount = 0;
 
-    public ApiIntegrationTests(WebApplicationFactory<Startup> webApplicationFactory, DatabaseFixture databaseFixture)
+    public ApiIntegrationTests(WebApplicationFactoryFixture webApplicationFactory)
     {
-        Client = new PlanificateurClient(webApplicationFactory.CreateClient());
-        DbContext = databaseFixture.DbContext;
+        this.webApplicationFactory = webApplicationFactory;
+        Client = new PlanificateurClient(webApplicationFactory.WebApplicationFactory!.CreateClient());
     }
 
+    public async Task InitializeAsync()
+    {
+        DbContext = await databaseContextFactory
+            .BuildNewDbContext(webApplicationFactory.DatabaseFixture.Database.GetConnectionString());
+    }
+    
     public async Task<RegisterResponse> RegisterNewUser()
     {
         var request = new RegisterRequest(
-            $"{DataFactory.Username}-{++UserCount}",
+            DataFactory.GetNewUsername(),
             DataFactory.Password
         );
         var (response, statusCode) = await Client.Register(request);
-        Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.Created, statusCode);
+        Assert.NotNull(response);
         
         return response;
     }
 
-    public async Task<LoginResponse> Login()
+    public async Task<LoginResponse> Login(string username)
     {
         var loginRequest = new LoginRequest(
-            $"{DataFactory.Username}-{UserCount}",
+            username,
             DataFactory.Password
         );
 
         var (response, statusCode) = await Client.Login(loginRequest);
-        Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, statusCode);
+        Assert.NotNull(response);
         return response;
     }
+
+
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
