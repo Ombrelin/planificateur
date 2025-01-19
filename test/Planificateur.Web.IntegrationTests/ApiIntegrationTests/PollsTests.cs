@@ -24,7 +24,7 @@ public class PollsTests : ApiIntegrationTests
         // Given
         var createPollRequest = new CreatePollRequest
         ("Test Poll", DateTime.UtcNow.AddDays(90),
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) });
+            [DateTime.UtcNow, DateTime.UtcNow.AddDays(1)]);
 
         // When
         var (response, statusCode) = await Client.CreatePoll(createPollRequest);
@@ -52,13 +52,13 @@ public class PollsTests : ApiIntegrationTests
         // Given
         var createPollRequest = new CreatePollRequest
         ("Test Poll", DateTime.UtcNow.AddDays(90),
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) });
+            [DateTime.UtcNow, DateTime.UtcNow.AddDays(1)]);
 
-        string userId = (await RegisterNewUser()).Id.ToString();
-        await Login();
+        (Guid userId, string username) = await RegisterNewUser();
+        await Login(username);
 
         // When
-        var (response, statusCode) = await Client.CreatePoll(createPollRequest);
+        (PollWithoutVotes? response, HttpStatusCode statusCode) = await Client.CreatePoll(createPollRequest);
 
         // Then
         statusCode.Should().Be(HttpStatusCode.Created);
@@ -76,7 +76,7 @@ public class PollsTests : ApiIntegrationTests
         pollInDb.Dates.Should().HaveCount(createPollRequest.Dates.Length);
         pollInDb.Dates[0].Should().BeCloseTo(createPollRequest.Dates[0], TimeSpan.FromMilliseconds(50));
         pollInDb.Dates[1].Should().BeCloseTo(createPollRequest.Dates[1], TimeSpan.FromMilliseconds(50));
-        pollInDb.AuthorId.Should().Be(userId);
+        pollInDb.AuthorId.Should().Be(userId.ToString());
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class PollsTests : ApiIntegrationTests
         var poll = new Poll
         (
             "Test Poll",
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            [DateTime.UtcNow, DateTime.UtcNow.AddDays(1)]
         );
         await DbContext.Polls.AddAsync(new PollEntity(poll));
         await DbContext.SaveChangesAsync();
@@ -133,7 +133,7 @@ public class PollsTests : ApiIntegrationTests
         var poll = new Poll
         (
             "Test Poll",
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            [DateTime.UtcNow, DateTime.UtcNow.AddDays(1)]
         );
         var vote = new Vote(poll.Id, "Test Voter");
         poll.Votes.Add(vote);
@@ -156,7 +156,7 @@ public class PollsTests : ApiIntegrationTests
         Poll poll = await InsertNewPoll();
 
         var voteRequest =
-            new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
+            new CreateVoteRequest("Test Voter Name", [Availability.Available, Availability.NotAvailable]);
 
         // When
         var (response, statusCode) = await Client.Vote(poll.Id, voteRequest);
@@ -175,7 +175,7 @@ public class PollsTests : ApiIntegrationTests
         VoteEntity voteFromDb = await DbContext.Votes.FirstAsync(voteRecord => voteRecord.Id == response.Id);
         voteFromDb.Id.Should().Be(response.Id);
         voteFromDb.VoterName.Should().Be(voteRequest.VoterName);
-        voteFromDb.Availabilities.Should().BeEquivalentTo(new[] { Availability.Available, Availability.NotAvailable });
+        voteFromDb.Availabilities.Should().BeEquivalentTo([Availability.Available, Availability.NotAvailable]);
         voteFromDb.PollId.Should().Be(poll.Id);
     }
 
@@ -184,7 +184,7 @@ public class PollsTests : ApiIntegrationTests
         var poll = new Poll
         (
             "Test Poll",
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            [DateTime.UtcNow, DateTime.UtcNow.AddDays(1)]
         );
         await DbContext.Polls.AddAsync(new PollEntity(poll));
         await DbContext.SaveChangesAsync();
@@ -196,7 +196,7 @@ public class PollsTests : ApiIntegrationTests
     {
         // Given
         var voteRequest =
-            new CreateVoteRequest("Test Voter Name", new[] { Availability.Available, Availability.NotAvailable });
+            new CreateVoteRequest("Test Voter Name", [Availability.Available, Availability.NotAvailable]);
 
         // When
         var (_, statusCode) = await Client.Vote(Guid.NewGuid(), voteRequest);
@@ -212,16 +212,16 @@ public class PollsTests : ApiIntegrationTests
         var otherPoll = new Poll
         (
             "Test Poll",
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            [DateTime.UtcNow, DateTime.UtcNow.AddDays(1)]
         );
 
-        Guid userId = Guid.Parse((await RegisterNewUser()).Id.ToString());
-        await Login();
-
+        (Guid userId, string username) = await RegisterNewUser();
+        await Login(username);
+        
         var pollFromCurrentUser = new Poll
         (
             "Test Poll",
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            [DateTime.UtcNow, DateTime.UtcNow.AddDays(1)]
         )
         {
             AuthorId = userId
@@ -230,7 +230,7 @@ public class PollsTests : ApiIntegrationTests
         var otherPollFromCurrentUser = new Poll
         (
             "Test Poll",
-            new[] { DateTime.UtcNow, DateTime.UtcNow.AddDays(1) }
+            [DateTime.UtcNow, DateTime.UtcNow.AddDays(1)]
         )
         {
             AuthorId = userId

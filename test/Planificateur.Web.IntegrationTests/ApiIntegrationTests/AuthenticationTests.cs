@@ -22,7 +22,7 @@ public class AuthenticationTests : ApiIntegrationTests
     {
         // Given
         var request = new RegisterRequest(
-            DataFactory.Username,
+            DataFactory.GetNewUsername(),
             DataFactory.Password
         );
 

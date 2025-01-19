@@ -11,16 +11,14 @@ using Planificateur.Web.Tests.Database;
 
 namespace Planificateur.Web.Tests.ApiIntegrationTests;
 
-public class ApiIntegrationTests : IClassFixture<WebApplicationFactoryFixture>, IAsyncLifetime
+public abstract class ApiIntegrationTests : IClassFixture<WebApplicationFactoryFixture>, IAsyncLifetime
 {
     private readonly WebApplicationFactoryFixture webApplicationFactory;
-    protected PlanificateurClient Client;
+    protected readonly PlanificateurClient Client;
     protected ApplicationDbContext DbContext = null!;
-    protected DataFactory DataFactory = new();
+    protected readonly DataFactory DataFactory = new();
     private readonly TestDatabaseContextFactory databaseContextFactory = new();
 
-    private static object userCountLock = new();
-    private static int UserCount = 0;
 
     public ApiIntegrationTests(WebApplicationFactoryFixture webApplicationFactory)
     {
@@ -36,13 +34,8 @@ public class ApiIntegrationTests : IClassFixture<WebApplicationFactoryFixture>, 
     
     public async Task<RegisterResponse> RegisterNewUser()
     {
-        lock (userCountLock)
-        {
-            UserCount++;
-        }
-        
         var request = new RegisterRequest(
-            $"{DataFactory.Username}-{UserCount}",
+            DataFactory.GetNewUsername(),
             DataFactory.Password
         );
         var (response, statusCode) = await Client.Register(request);
@@ -52,16 +45,16 @@ public class ApiIntegrationTests : IClassFixture<WebApplicationFactoryFixture>, 
         return response;
     }
 
-    public async Task<LoginResponse> Login()
+    public async Task<LoginResponse> Login(string username)
     {
         var loginRequest = new LoginRequest(
-            $"{DataFactory.Username}-{UserCount}",
+            username,
             DataFactory.Password
         );
 
         var (response, statusCode) = await Client.Login(loginRequest);
-        Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, statusCode);
+        Assert.NotNull(response);
         return response;
     }
 
